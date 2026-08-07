@@ -14,10 +14,27 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
+
+            $table->unsignedBigInteger('telegram_id')->nullable()->unique();
+            $table->string('telegram_username')->nullable();
+            $table->string('phone')->nullable()->unique();
+            $table->timestamp('phone_verified_at')->nullable();
+
+            $table->foreignId('city_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('avatar_path')->nullable();
+            $table->text('about')->nullable();
+
+            $table->boolean('is_executor')->default(false);
+            $table->decimal('rating_avg', 3, 2)->default(0);
+            $table->unsignedInteger('rating_count')->default(0);
+
+            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_banned')->default(false);
+
             $table->timestamps();
         });
 
