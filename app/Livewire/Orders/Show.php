@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Review;
 use App\Services\LiqPay\PayoutService;
+use App\Services\Telegram\UserNotifier;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -32,7 +33,7 @@ class Show extends Component
         $this->order = $order;
     }
 
-    public function makeOffer(): void
+    public function makeOffer(UserNotifier $notifier): void
     {
         $this->validate([
             'offerPrice' => ['required', 'numeric', 'min:1'],
@@ -47,12 +48,17 @@ class Show extends Component
             ['price' => $this->offerPrice, 'message' => $this->offerMessage, 'status' => Offer::STATUS_PENDING]
         );
 
+        $notifier->notify(
+            $this->order->customer,
+            "🆕 Новый отклик на заказ #{$this->order->id} \"{$this->order->title}\" от ".Auth::user()->name." — {$this->offerPrice} MDL."
+        );
+
         $this->offerPrice = '';
         $this->offerMessage = '';
         $this->order->refresh();
     }
 
-    public function acceptOffer(int $offerId): void
+    public function acceptOffer(int $offerId, UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
         abort_unless($this->order->status === Order::STATUS_OPEN, 403);
@@ -70,10 +76,15 @@ class Show extends Component
             'accepted_offer_id' => $offer->id,
         ]);
 
+        $notifier->notify(
+            $offer->executor,
+            "✅ Ваш отклик на заказ #{$this->order->id} \"{$this->order->title}\" принят! Свяжитесь с заказчиком в чате."
+        );
+
         $this->order->refresh();
     }
 
-    public function payCash(): void
+    public function payCash(UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
         abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
@@ -88,10 +99,16 @@ class Show extends Component
         ]);
 
         $this->order->update(['paid_at' => now()]);
+
+        $notifier->notify(
+            $this->order->acceptedOffer->executor,
+            "💵 Заказчик подтвердил оплату наличными по заказу #{$this->order->id} \"{$this->order->title}\"."
+        );
+
         $this->order->refresh();
     }
 
-    public function markCompleted(PayoutService $payoutService): void
+    public function markCompleted(PayoutService $payoutService, UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
         abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
@@ -114,10 +131,15 @@ class Show extends Component
             $payoutService->payoutForOrder($this->order->fresh(['acceptedOffer.executor']));
         }
 
+        $notifier->notify(
+            $this->order->acceptedOffer->executor,
+            "🎉 Заказчик подтвердил выполнение заказа #{$this->order->id} \"{$this->order->title}\". Спасибо за работу!"
+        );
+
         $this->order->refresh();
     }
 
-    public function sendMessage(): void
+    public function sendMessage(UserNotifier $notifier): void
     {
         $this->validate(['newMessage' => ['required', 'string', 'max:2000']]);
 
@@ -130,6 +152,11 @@ class Show extends Component
             'recipient_id' => $recipientId,
             'body' => $this->newMessage,
         ]);
+
+        $notifier->notify(
+            \App\Models\User::find($recipientId),
+            "💬 Новое сообщение по заказу #{$this->order->id} от ".Auth::user()->name.":\n".mb_substr($this->newMessage, 0, 300)
+        );
 
         $this->newMessage = '';
     }

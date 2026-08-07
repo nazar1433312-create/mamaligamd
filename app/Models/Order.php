@@ -74,4 +74,9 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
 }

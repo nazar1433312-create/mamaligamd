@@ -36,8 +36,9 @@
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ __('История') }}</h2>
             <div class="space-y-3">
                 @forelse ($customerHistory as $order)
-                    <a href="{{ route('orders.show', $order) }}" wire:navigate class="block bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-400 opacity-80">
-                        <div class="flex justify-between items-center">
+                    <div class="relative bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-400 opacity-80">
+                        <a href="{{ route('orders.show', $order) }}" wire:navigate class="absolute inset-0 z-0"></a>
+                        <div class="relative z-10 flex justify-between items-center pointer-events-none">
                             <div>
                                 <span class="text-xs text-indigo-600">{{ $order->category->name }}</span>
                                 <h3 class="font-medium">{{ $order->title }}</h3>
@@ -45,9 +46,17 @@
                             </div>
                             <div class="text-right text-sm text-gray-500">
                                 <div>{{ __(ucfirst($order->status)) }}</div>
+                                @if ($order->status === 'completed')
+                                    <div class="pointer-events-auto mt-1">
+                                        <button wire:click="repeatOrder({{ $order->id }})"
+                                            class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-md hover:bg-indigo-700">
+                                            🔁 {{ __('Заказать снова') }}
+                                        </button>
+                                    </div>
+                                @endif
                             </div>
                         </div>
-                    </a>
+                    </div>
                 @empty
                     <p class="text-gray-400 text-sm">{{ __('Вы ещё не публиковали заказы.') }}</p>
                 @endforelse

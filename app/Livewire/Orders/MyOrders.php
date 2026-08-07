@@ -14,6 +14,26 @@ class MyOrders extends Component
 
     private const ACTIVE_STATUSES = [Order::STATUS_OPEN, Order::STATUS_IN_PROGRESS, Order::STATUS_DISPUTED];
 
+    public function repeatOrder(int $orderId)
+    {
+        $order = Order::where('customer_id', Auth::id())->findOrFail($orderId);
+
+        $new = Order::create([
+            'customer_id' => Auth::id(),
+            'category_id' => $order->category_id,
+            'city_id' => $order->city_id,
+            'title' => $order->title,
+            'description' => $order->description,
+            'address' => $order->address,
+            'budget_min' => $order->budget_min,
+            'budget_max' => $order->budget_max,
+            'status' => Order::STATUS_OPEN,
+            'commission_percent' => config('services.platform.commission_percent'),
+        ]);
+
+        return $this->redirect(route('orders.show', $new), navigate: true);
+    }
+
     public function render()
     {
         $customerOrders = Order::where('customer_id', Auth::id())->with('category')->withCount('offers')->latest()->get();

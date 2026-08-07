@@ -23,6 +23,7 @@
 
                     <div class="hidden sm:flex items-center gap-6 text-sm font-medium">
                         <a href="{{ route('orders.index') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Заказы') }}</a>
+                        <a href="{{ route('users.directory') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Специалисты') }}</a>
 
                         @auth
                             <a href="{{ route('orders.create') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Опубликовать заказ') }}</a>
@@ -52,6 +53,11 @@
                             <a href="{{ route('messages.inbox') }}" wire:navigate title="{{ __('Сообщения') }}"
                                class="text-gray-500 hover:text-indigo-600 {{ request()->routeIs('messages.*') ? 'text-indigo-700' : '' }}">
                                 💬
+                            </a>
+
+                            <a href="{{ route('orders.favorites') }}" wire:navigate title="{{ __('Избранное') }}"
+                               class="text-gray-500 hover:text-amber-500 {{ request()->routeIs('orders.favorites') ? 'text-amber-500' : '' }}">
+                                ★
                             </a>
                         @endauth
 

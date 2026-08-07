@@ -5,6 +5,7 @@ namespace App\Livewire\Orders;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Order;
+use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -41,10 +42,20 @@ class Index extends Component
             ->latest()
             ->paginate(12);
 
+        $topExecutors = User::where('is_executor', true)
+            ->where('is_banned', false)
+            ->whereHas('completedJobs')
+            ->withCount('completedJobs')
+            ->orderByDesc('rating_avg')
+            ->orderByDesc('completed_jobs_count')
+            ->take(5)
+            ->get();
+
         return view('livewire.orders.index', [
             'orders' => $orders,
             'categories' => Category::whereNull('parent_id')->with('children')->orderBy('sort_order')->get(),
             'cities' => City::where('is_active', true)->orderBy('name')->get(),
+            'topExecutors' => $topExecutors,
         ]);
     }
 }

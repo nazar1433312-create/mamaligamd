@@ -30,6 +30,14 @@
         @if ($user->about)
             <p class="mt-4 text-gray-700 whitespace-pre-line">{{ $user->about }}</p>
         @endif
+
+        @auth
+            @if ($user->id !== auth()->id())
+                <div class="mt-4">
+                    <livewire:reports.create-report :reported-user="$user" :key="'report-user-'.$user->id" />
+                </div>
+            @endif
+        @endauth
     </div>
 
     <div class="bg-white p-6 rounded-lg border border-gray-200">

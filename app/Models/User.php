@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -56,6 +57,13 @@ class User extends Authenticatable
         return $this->hasMany(Offer::class, 'executor_id');
     }
 
+    public function completedJobs(): HasMany
+    {
+        return $this->hasMany(Offer::class, 'executor_id')
+            ->where('status', Offer::STATUS_ACCEPTED)
+            ->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_COMPLETED));
+    }
+
     public function payoutMethods(): HasMany
     {
         return $this->hasMany(PayoutMethod::class);
@@ -74,5 +82,25 @@ class User extends Authenticatable
     public function verificationRequests(): HasMany
     {
         return $this->hasMany(VerificationRequest::class);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoriteOrders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'favorites')->withTimestamps();
+    }
+
+    public function reportsFiled(): HasMany
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
+    }
+
+    public function reportsReceived(): HasMany
+    {
+        return $this->hasMany(Report::class, 'reported_user_id');
     }
 }

@@ -10,6 +10,26 @@
         </div>
     </div>
 
+    @if ($topExecutors->isNotEmpty())
+        <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">🏆 {{ __('Топ исполнителей') }}</h2>
+            <div class="flex flex-wrap gap-3">
+                @foreach ($topExecutors as $executor)
+                    <a href="{{ route('users.show', $executor) }}" wire:navigate
+                       class="flex items-center gap-2 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                        <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                            {{ mb_substr($executor->name, 0, 1) }}
+                        </span>
+                        <span class="font-medium text-gray-900">{{ $executor->name }}</span>
+                        @if ($executor->is_verified) <x-verified-badge /> @endif
+                        <x-rating-badge :user="$executor" />
+                        <span class="text-xs text-gray-400">· {{ $executor->completed_jobs_count }} {{ __('заказов') }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <input type="text" wire:model.live.debounce.400ms="search" placeholder="{{ __('Поиск по заголовку...') }}"
                class="rounded-md border-gray-300 text-sm sm:col-span-2">
@@ -36,12 +56,21 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($orders as $order)
-            <a href="{{ route('orders.show', $order) }}" wire:navigate
-               class="block bg-white p-5 rounded-xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition">
-                <div class="text-xs text-indigo-600 font-medium mb-1">{{ $order->category->name }}</div>
-                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ $order->title }}</h3>
-                <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $order->description }}</p>
-                <div class="flex items-center justify-between text-sm">
+            <div class="relative bg-white p-5 rounded-xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition">
+                <a href="{{ route('orders.show', $order) }}" wire:navigate class="absolute inset-0 z-0" aria-label="{{ $order->title }}"></a>
+
+                <div class="relative z-10 flex items-start justify-between mb-1 pointer-events-none">
+                    <span class="text-xs text-indigo-600 font-medium">{{ $order->category->name }}</span>
+                    @auth
+                        <div class="pointer-events-auto">
+                            <livewire:orders.favorite-button :order="$order" :key="'fav-'.$order->id" />
+                        </div>
+                    @endauth
+                </div>
+
+                <h3 class="relative z-10 font-semibold text-gray-900 mb-2 line-clamp-2 pointer-events-none">{{ $order->title }}</h3>
+                <p class="relative z-10 text-sm text-gray-500 mb-3 line-clamp-2 pointer-events-none">{{ $order->description }}</p>
+                <div class="relative z-10 flex items-center justify-between text-sm pointer-events-none">
                     <span class="text-gray-500">{{ $order->city?->name ?? __('Онлайн') }}</span>
                     <span class="font-semibold text-gray-900">
                         @if ($order->budget_min)
@@ -55,8 +84,8 @@
                         @endif
                     </span>
                 </div>
-                <div class="mt-2 text-xs text-gray-400">{{ $order->offers_count }} {{ __('откликов') }}</div>
-            </a>
+                <div class="relative z-10 mt-2 text-xs text-gray-400 pointer-events-none">{{ $order->offers_count }} {{ __('откликов') }}</div>
+            </div>
         @empty
             <div class="col-span-full text-center py-12 text-gray-500">
                 {{ __('Заказов не найдено.') }}

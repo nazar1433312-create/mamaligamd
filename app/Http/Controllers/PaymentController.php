@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\LiqPay\LiqPayClient;
+use App\Services\Telegram\UserNotifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,7 +45,7 @@ class PaymentController extends Controller
         return view('payments.liqpay-redirect', $fields);
     }
 
-    public function callback(Request $request, LiqPayClient $liqPay): Response
+    public function callback(Request $request, LiqPayClient $liqPay, UserNotifier $notifier): Response
     {
         $data = $request->input('data');
         $signature = $request->input('signature');
@@ -79,7 +80,13 @@ class PaymentController extends Controller
         ]);
 
         if ($success) {
-            $payment->order()->update(['paid_at' => now()]);
+            $order = $payment->order()->first();
+            $order->update(['paid_at' => now()]);
+
+            $notifier->notify(
+                $order->loadMissing('acceptedOffer.executor')->acceptedOffer?->executor,
+                "💳 Оплата картой по заказу #{$order->id} \"{$order->title}\" прошла успешно."
+            );
         }
 
         return response()->noContent();

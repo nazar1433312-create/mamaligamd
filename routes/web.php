@@ -8,7 +8,9 @@ use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Orders as AdminOrders;
 use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\Verifications as AdminVerifications;
+use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Orders\Create as OrdersCreate;
+use App\Livewire\Orders\Favorites as OrdersFavorites;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Orders\Show as OrdersShow;
@@ -21,6 +23,7 @@ use App\Livewire\Settings\Verification as VerificationSettings;
 use App\Livewire\Support\Create as SupportCreate;
 use App\Livewire\Support\MyTickets as SupportMyTickets;
 use App\Livewire\Support\Show as SupportShow;
+use App\Livewire\Users\Directory as UsersDirectory;
 use App\Livewire\Users\PublicProfile;
 use Illuminate\Support\Facades\Route;
 
@@ -48,9 +51,11 @@ Route::view('profile', 'profile')
 Route::get('orders', OrdersIndex::class)->name('orders.index');
 Route::get('orders/create', OrdersCreate::class)->middleware('auth')->name('orders.create');
 Route::get('orders/mine', MyOrders::class)->middleware('auth')->name('orders.my');
+Route::get('orders/favorites', OrdersFavorites::class)->middleware('auth')->name('orders.favorites');
 Route::get('executor', ExecutorDashboard::class)->middleware('auth')->name('executor.dashboard');
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
+Route::get('specialists', UsersDirectory::class)->name('users.directory');
 Route::get('users/{user}', PublicProfile::class)->name('users.show');
 
 Route::middleware('auth')->group(function () {
@@ -82,6 +87,7 @@ Route::middleware(['admin.gate', 'auth', 'admin'])->prefix('admin')->name('admin
     Route::get('verifications', AdminVerifications::class)->name('verifications');
     Route::get('verifications/{verificationRequest}/document/{index}', VerificationDocumentController::class)
         ->name('verifications.document');
+    Route::get('reports', AdminReports::class)->name('reports');
 });
 
 require __DIR__.'/auth.php';

@@ -3,13 +3,18 @@
         <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-medium text-indigo-600">{{ $order->category->name }}</span>
-                <span @class([
-                    'text-xs font-medium px-2 py-1 rounded-full',
-                    'bg-green-100 text-green-700' => $order->status === 'open',
-                    'bg-blue-100 text-blue-700' => $order->status === 'in_progress',
-                    'bg-gray-100 text-gray-700' => $order->status === 'completed',
-                    'bg-red-100 text-red-700' => in_array($order->status, ['cancelled', 'disputed']),
-                ])>{{ __(ucfirst($order->status)) }}</span>
+                <div class="flex items-center gap-2">
+                    <span @class([
+                        'text-xs font-medium px-2 py-1 rounded-full',
+                        'bg-green-100 text-green-700' => $order->status === 'open',
+                        'bg-blue-100 text-blue-700' => $order->status === 'in_progress',
+                        'bg-gray-100 text-gray-700' => $order->status === 'completed',
+                        'bg-red-100 text-red-700' => in_array($order->status, ['cancelled', 'disputed']),
+                    ])>{{ __(ucfirst($order->status)) }}</span>
+                    @auth
+                        <livewire:orders.favorite-button :order="$order" :key="'fav-'.$order->id" />
+                    @endauth
+                </div>
             </div>
 
             <h1 class="text-2xl font-bold mb-3">{{ $order->title }}</h1>
@@ -33,6 +38,14 @@
                     @if ($order->customer->is_verified) <x-verified-badge /> @endif
                 </span>
             </div>
+
+            @auth
+                @if ($order->customer_id !== auth()->id())
+                    <div class="mt-3">
+                        <livewire:reports.create-report :order="$order" :key="'report-order-'.$order->id" />
+                    </div>
+                @endif
+            @endauth
         </div>
 
         {{-- Offers --}}
