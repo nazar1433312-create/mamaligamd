@@ -1,7 +1,15 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
         postgresql-client \
+        libpng \
+        libzip \
+        libwebp \
+        oniguruma \
+        icu-libs \
+        freetype \
+        libjpeg-turbo \
+    && apk add --no-cache --virtual .build-deps \
         postgresql-dev \
         libpng-dev \
         libzip-dev \
@@ -21,7 +29,7 @@ RUN apk add --no-cache \
         intl \
         opcache \
         pcntl \
-    && apk del --no-cache postgresql-dev libpng-dev libzip-dev libwebp-dev freetype-dev libjpeg-turbo-dev icu-dev oniguruma-dev
+    && apk del --no-cache .build-deps
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
