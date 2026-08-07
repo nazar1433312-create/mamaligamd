@@ -49,7 +49,9 @@
                                 @if ($order->status === 'completed')
                                     <div class="pointer-events-auto mt-1">
                                         <button wire:click="repeatOrder({{ $order->id }})"
-                                            class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-md hover:bg-indigo-700">
+                                            wire:loading.attr="disabled"
+                                            wire:target="repeatOrder({{ $order->id }})"
+                                            class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-md hover:bg-indigo-700 disabled:opacity-50">
                                             🔁 {{ __('Заказать снова') }}
                                         </button>
                                     </div>

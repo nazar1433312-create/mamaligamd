@@ -6,7 +6,7 @@
             <textarea wire:model="reason" rows="2" placeholder="{{ __('Опишите проблему') }}" class="w-full rounded-md border-gray-300 text-sm"></textarea>
             @error('reason') <p class="text-red-600 text-xs">{{ $message }}</p> @enderror
             <div class="flex gap-2">
-                <button type="submit" class="text-xs bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700">{{ __('Отправить жалобу') }}</button>
+                <button type="submit" wire:loading.attr="disabled" wire:target="submit" class="text-xs bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 disabled:opacity-50">{{ __('Отправить жалобу') }}</button>
                 <button type="button" wire:click="$set('showForm', false)" class="text-xs text-gray-500">{{ __('Отмена') }}</button>
             </div>
         </form>
