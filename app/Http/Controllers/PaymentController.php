@@ -32,7 +32,7 @@ class PaymentController extends Controller
         $fields = $liqPay->checkoutFields([
             'action' => 'pay',
             'amount' => (float) $amount,
-            'currency' => 'UAH',
+            'currency' => 'MDL',
             'description' => "Оплата заказа #{$order->id}: {$order->title}",
             'order_id' => "order-{$order->id}-payment-{$payment->id}",
             'result_url' => route('orders.show', $order),

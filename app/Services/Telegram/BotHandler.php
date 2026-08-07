@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Offer;
 use App\Models\Order;
+use App\Models\SupportMessage;
+use App\Models\SupportTicket;
 use App\Models\TelegramLoginToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -32,6 +34,10 @@ class BotHandler
         $chatId = $message['chat']['id'];
         $from = $message['from'];
         $text = trim($message['text'] ?? '');
+
+        if ($this->handleAdminSupportReply($chatId, $message, $text)) {
+            return;
+        }
 
         $user = $this->findOrCreateUser($from, $chatId);
 
@@ -124,6 +130,48 @@ class BotHandler
 
             return;
         }
+    }
+
+    // --- Support ticket replies from the admin ------------------------------------
+
+    /**
+     * If this message comes from the admin chat and is a reply to one of our
+     * ticket notifications, treat it as the admin's answer to that ticket.
+     */
+    private function handleAdminSupportReply(int $chatId, array $message, string $text): bool
+    {
+        $adminChatId = config('services.telegram.admin_chat_id');
+        $replyTo = $message['reply_to_message']['message_id'] ?? null;
+
+        if (! $adminChatId || (string) $chatId !== (string) $adminChatId || ! $replyTo || $text === '') {
+            return false;
+        }
+
+        $ticket = SupportTicket::where('telegram_notify_chat_id', $chatId)
+            ->where('telegram_notify_message_id', $replyTo)
+            ->first();
+
+        if (! $ticket) {
+            return false;
+        }
+
+        $ticket->messages()->create([
+            'sender_type' => SupportMessage::SENDER_ADMIN,
+            'body' => $text,
+        ]);
+
+        $ticket->update(['status' => SupportTicket::STATUS_OPEN]);
+
+        if ($ticket->user?->telegram_id) {
+            $this->api->sendMessage(
+                $ticket->user->telegram_id,
+                "💬 Ответ по вашему обращению #{$ticket->id} \"{$ticket->subject}\":\n\n{$text}"
+            );
+        }
+
+        $this->api->sendMessage($chatId, "✅ Ответ отправлен пользователю по обращению #{$ticket->id}.");
+
+        return true;
     }
 
     // --- Registration / menu ---------------------------------------------------
@@ -239,7 +287,7 @@ class BotHandler
                 $state['data']['description'] = mb_substr($text, 0, 2000);
                 $state['step'] = 'budget';
                 $this->setState($chatId, $state);
-                $this->api->sendMessage($chatId, 'Какой бюджет? Укажите сумму в грн (или "договорная"):', $this->cancelKeyboard());
+                $this->api->sendMessage($chatId, 'Какой бюджет? Укажите сумму в MDL (или "договорная"):', $this->cancelKeyboard());
                 break;
 
             case 'budget':

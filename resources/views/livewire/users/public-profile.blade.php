@@ -7,7 +7,7 @@
             <div>
                 <h1 class="text-xl font-bold">{{ $user->name }}</h1>
                 <div class="text-sm text-gray-500">
-                    ⭐ {{ number_format($user->rating_avg, 1) }} ({{ $user->rating_count }} отзывов)
+                    ⭐ {{ number_format($user->rating_avg, 1) }} ({{ $user->rating_count }} {{ __('отзывов') }})
                     @if ($user->city) · 📍 {{ $user->city->name }} @endif
                 </div>
             </div>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <h2 class="font-semibold mb-4">Отзывы</h2>
+        <h2 class="font-semibold mb-4">{{ __('Отзывы') }}</h2>
         <div class="space-y-4">
             @forelse ($reviews as $review)
                 <div class="border-b border-gray-100 pb-4 last:border-0">
@@ -32,7 +32,7 @@
                     @endif
                 </div>
             @empty
-                <p class="text-sm text-gray-400">Отзывов пока нет.</p>
+                <p class="text-sm text-gray-400">{{ __('Отзывов пока нет.') }}</p>
             @endforelse
         </div>
     </div>

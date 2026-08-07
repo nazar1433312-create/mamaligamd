@@ -10,11 +10,23 @@ use App\Livewire\Orders\Create as OrdersCreate;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Orders\Show as OrdersShow;
+use App\Livewire\Admin\Support as AdminSupport;
 use App\Livewire\Settings\PayoutSettings;
+use App\Livewire\Support\Create as SupportCreate;
+use App\Livewire\Support\MyTickets as SupportMyTickets;
+use App\Livewire\Support\Show as SupportShow;
 use App\Livewire\Users\PublicProfile;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/orders');
+
+Route::get('lang/{locale}', function (string $locale) {
+    if (in_array($locale, \App\Http\Middleware\SetLocale::SUPPORTED, true)) {
+        session(['locale' => $locale]);
+    }
+
+    return back();
+})->name('lang.switch');
 
 Route::post('telegram/webhook/{secret}', TelegramWebhookController::class)
     ->name('telegram.webhook');
@@ -36,6 +48,10 @@ Route::get('users/{user}', PublicProfile::class)->name('users.show');
 
 Route::get('settings/payout', PayoutSettings::class)->middleware('auth')->name('settings.payout');
 
+Route::get('support', SupportCreate::class)->name('support.create');
+Route::get('support/mine', SupportMyTickets::class)->middleware('auth')->name('support.my');
+Route::get('support/{ticket}', SupportShow::class)->middleware('auth')->name('support.show');
+
 Route::middleware('auth')->group(function () {
     Route::get('payments/liqpay/checkout/{order}', [PaymentController::class, 'checkout'])
         ->name('payments.liqpay.checkout');
@@ -49,6 +65,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('users', AdminUsers::class)->name('users');
     Route::get('categories', AdminCategories::class)->name('categories');
     Route::get('orders', AdminOrders::class)->name('orders');
+    Route::get('support', AdminSupport::class)->name('support');
 });
 
 require __DIR__.'/auth.php';

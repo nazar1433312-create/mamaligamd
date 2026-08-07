@@ -10,18 +10,22 @@ class CitySeeder extends Seeder
     public function run(): void
     {
         $cities = [
-            'Київ' => 'Київська область',
-            'Харків' => 'Харківська область',
-            'Одеса' => 'Одеська область',
-            'Дніпро' => 'Дніпропетровська область',
-            'Львів' => 'Львівська область',
-            'Запоріжжя' => 'Запорізька область',
-            'Кривий Ріг' => 'Дніпропетровська область',
-            'Вінниця' => 'Вінницька область',
-            'Миколаїв' => 'Миколаївська область',
-            'Полтава' => 'Полтавська область',
-            'Івано-Франківськ' => 'Івано-Франківська область',
-            'Чернігів' => 'Чернігівська область',
+            'Chișinău' => 'Municipiul Chișinău',
+            'Bălți' => 'Municipiul Bălți',
+            'Tiraspol' => 'Transnistria',
+            'Bender (Tighina)' => 'Transnistria',
+            'Cahul' => 'Raionul Cahul',
+            'Ungheni' => 'Raionul Ungheni',
+            'Soroca' => 'Raionul Soroca',
+            'Orhei' => 'Raionul Orhei',
+            'Comrat' => 'UTA Găgăuzia',
+            'Edineț' => 'Raionul Edineț',
+            'Strășeni' => 'Raionul Strășeni',
+            'Hîncești' => 'Raionul Hîncești',
+            'Căușeni' => 'Raionul Căușeni',
+            'Drochia' => 'Raionul Drochia',
+            'Florești' => 'Raionul Florești',
+            'Rîbnița' => 'Transnistria',
         ];
 
         foreach ($cities as $name => $region) {

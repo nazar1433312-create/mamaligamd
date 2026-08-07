@@ -43,7 +43,7 @@ class PayoutService
         $response = $this->liqPay->request([
             'action' => 'paytocard',
             'amount' => $netAmount,
-            'currency' => 'UAH',
+            'currency' => 'MDL',
             'description' => "Выплата за заказ #{$order->id}",
             'order_id' => "payout-order-{$order->id}-payment-{$payment->id}",
             'card' => $payoutMethod->card_number_encrypted,
