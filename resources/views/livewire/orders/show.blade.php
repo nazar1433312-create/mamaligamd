@@ -13,7 +13,7 @@
                     ])>{{ __(ucfirst($order->status)) }}</span>
                     @auth
                         <livewire:orders.favorite-button :order="$order" :key="'fav-'.$order->id" />
-                        @if ($order->status === 'open' && $order->customer_id === auth()->id())
+                        @if (in_array($order->status, ['open', 'pending_payment']) && $order->customer_id === auth()->id())
                             <a href="{{ route('orders.edit', $order) }}" wire:navigate class="text-sm text-gray-400 hover:text-indigo-600">✏️</a>
                         @endif
                     @endauth
@@ -51,15 +51,26 @@
             @endauth
         </div>
 
+        {{-- Pending payment: order not published yet --}}
+        @auth
+            @if ($order->status === 'pending_payment' && $order->customer_id === auth()->id())
+                <div class="bg-amber-50 border border-amber-200 p-6 rounded-xl">
+                    <h2 class="font-semibold mb-2">{{ __('Заказ ещё не опубликован') }}</h2>
+                    <p class="text-sm text-gray-600 mb-4">{{ __('Комиссия платформы') }}: {{ $platformFeeAmount }} MDL — {{ __('оплатите, чтобы заказ стал виден исполнителям.') }}</p>
+                    <a href="{{ route('platform-fee.checkout', $order) }}"
+                        class="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-indigo-700">
+                        💳 {{ __('Оплатить') }} {{ $platformFeeAmount }} MDL {{ __('и опубликовать') }}
+                    </a>
+                </div>
+            @endif
+        @endauth
+
         {{-- Offers --}}
         @if ($order->status === 'open')
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h2 class="font-semibold mb-1">{{ __('Отклики') }} ({{ $offers->count() }})</h2>
+                <h2 class="font-semibold mb-4">{{ __('Отклики') }} ({{ $offers->count() }})</h2>
 
                 @auth
-                    @if ($order->customer_id === auth()->id())
-                        <p class="text-xs text-gray-400 mb-4">{{ __('Комиссия платформы') }}: {{ $platformFeeAmount }} MDL — {{ __('оплачивается при выборе исполнителя.') }}</p>
-                    @endif
                     @if ($order->customer_id !== auth()->id())
                         <div class="mb-6 p-4 bg-gray-50 rounded-md">
                             @if ($myOffer)
@@ -94,10 +105,8 @@
                             </div>
                             @auth
                                 @if ($order->customer_id === auth()->id())
-                                    <a href="{{ route('platform-fee.checkout', [$order, $offer]) }}"
-                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700">
-                                        {{ __('В работе') }} — {{ $platformFeeAmount }} MDL
-                                    </a>
+                                    <button wire:click="acceptOffer({{ $offer->id }})" wire:confirm="{{ __('Выбрать этого исполнителя?') }}"
+                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700">{{ __('В работе') }}</button>
                                 @endif
                             @endauth
                         </div>

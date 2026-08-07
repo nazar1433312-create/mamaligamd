@@ -20,6 +20,18 @@ class BotHandler
         private readonly TelegramApi $api
     ) {}
 
+    private function sendPaymentLink(User $user, int $chatId, Order $order): void
+    {
+        $loginToken = TelegramLoginToken::issueFor($user);
+        $url = rtrim(config('app.url'), '/')."/auth/telegram/{$loginToken->token}?to=".rawurlencode("/orders/{$order->id}/start");
+
+        $this->api->sendMessage(
+            $chatId,
+            "Осталось оплатить комиссию платформы за заказ «{$order->title}»: ".config('services.platform.fee_amount')." MDL, чтобы заказ #{$order->id} стал виден исполнителям.",
+            ['inline_keyboard' => [[['text' => '💳 Оплатить и опубликовать', 'url' => $url]]]]
+        );
+    }
+
     public function handleUpdate(array $update): void
     {
         if (isset($update['message'])) {
@@ -357,12 +369,13 @@ class BotHandler
             'description' => $d['description'],
             'budget_min' => $budgetMin,
             'budget_max' => $budgetMax,
+            'status' => Order::STATUS_PENDING_PAYMENT,
         ]);
 
         $this->clearState($chatId);
 
-        $this->api->editMessageText($chatId, $messageId, "✅ Заказ #{$order->id} опубликован!");
-        $this->api->sendMessage($chatId, 'Вы получите уведомление, как только появятся отклики исполнителей.', $this->mainMenu());
+        $this->api->editMessageText($chatId, $messageId, "Заказ #{$order->id} создан, осталось оплатить публикацию.");
+        $this->sendPaymentLink($user, $chatId, $order);
     }
 
     private function parseBudget(string $text): array

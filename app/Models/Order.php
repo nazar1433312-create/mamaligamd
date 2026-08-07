@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Order extends Model
 {
+    const STATUS_PENDING_PAYMENT = 'pending_payment';
+
     const STATUS_OPEN = 'open';
 
     const STATUS_IN_PROGRESS = 'in_progress';

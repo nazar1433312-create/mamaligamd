@@ -12,7 +12,9 @@ class MyOrders extends Component
 {
     public string $tab = 'customer';
 
-    private const ACTIVE_STATUSES = [Order::STATUS_OPEN, Order::STATUS_IN_PROGRESS, Order::STATUS_DISPUTED];
+    private const ACTIVE_STATUSES = [
+        Order::STATUS_PENDING_PAYMENT, Order::STATUS_OPEN, Order::STATUS_IN_PROGRESS, Order::STATUS_DISPUTED,
+    ];
 
     public function repeatOrder(int $orderId)
     {
@@ -27,10 +29,10 @@ class MyOrders extends Component
             'address' => $order->address,
             'budget_min' => $order->budget_min,
             'budget_max' => $order->budget_max,
-            'status' => Order::STATUS_OPEN,
+            'status' => Order::STATUS_PENDING_PAYMENT,
         ]);
 
-        return $this->redirect(route('orders.show', $new), navigate: true);
+        return redirect()->route('platform-fee.checkout', $new);
     }
 
     public function render()

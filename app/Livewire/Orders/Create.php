@@ -46,11 +46,10 @@ class Create extends Component
         $order = Order::create([
             ...$data,
             'customer_id' => Auth::id(),
+            'status' => Order::STATUS_PENDING_PAYMENT,
         ]);
 
-        session()->flash('status', 'Заказ опубликован!');
-
-        return $this->redirect(route('orders.show', $order), navigate: true);
+        return redirect()->route('platform-fee.checkout', $order);
     }
 
     public function render()
@@ -58,6 +57,7 @@ class Create extends Component
         return view('livewire.orders.create', [
             'categories' => Category::whereNull('parent_id')->with('children')->orderBy('sort_order')->get(),
             'cities' => City::where('is_active', true)->orderBy('name')->get(),
+            'platformFeeAmount' => config('services.platform.fee_amount'),
         ]);
     }
 }

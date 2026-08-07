@@ -31,7 +31,11 @@ class Edit extends Component
     public function mount(Order $order): void
     {
         abort_unless($order->customer_id === Auth::id(), 403);
-        abort_unless($order->status === Order::STATUS_OPEN, 403, 'Редактировать можно только открытый заказ.');
+        abort_unless(
+            in_array($order->status, [Order::STATUS_PENDING_PAYMENT, Order::STATUS_OPEN], true),
+            403,
+            'Редактировать можно только заказ, который ещё не в работе.'
+        );
 
         $this->order = $order;
         $this->category_id = $order->category_id;
@@ -59,7 +63,10 @@ class Edit extends Component
     public function save()
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
-        abort_unless($this->order->status === Order::STATUS_OPEN, 403);
+        abort_unless(
+            in_array($this->order->status, [Order::STATUS_PENDING_PAYMENT, Order::STATUS_OPEN], true),
+            403
+        );
 
         $data = $this->validate();
 

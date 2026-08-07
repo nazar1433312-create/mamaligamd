@@ -31,6 +31,7 @@
     "Город": "Oraș",
     "Не указан / онлайн": "Nespecificat / online",
     "Адрес (необязательно)": "Adresă (opțional)",
+    "Pending_payment": "Așteaptă plata",
     "Open": "Deschisă",
     "In_progress": "În lucru",
     "Completed": "Finalizată",
@@ -158,5 +159,9 @@
     "Комиссия платформы": "Comisionul platformei",
     "оплачивается при выборе исполнителя.": "se plătește la alegerea executantului.",
     "Редактировать заказ": "Editează comanda",
-    "Сохранить изменения": "Salvează modificările"
+    "Сохранить изменения": "Salvează modificările",
+    "Заказ ещё не опубликован": "Comanda nu este încă publicată",
+    "оплатите, чтобы заказ стал виден исполнителям.": "plătește pentru ca comanda să devină vizibilă executanților.",
+    "и опубликовать": "și publică",
+    "оплата откроется на следующем шаге.": "plata se va deschide la pasul următor."
 }

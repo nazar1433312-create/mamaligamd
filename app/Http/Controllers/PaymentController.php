@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\LiqPay\LiqPayClient;
@@ -62,8 +61,8 @@ class PaymentController extends Controller
         $status = $payload['status'] ?? 'unknown';
         $success = in_array($status, ['success', 'sandbox'], true);
 
-        if (preg_match('/^platformfee-order-(\d+)-offer-(\d+)-payment-(\d+)$/', $orderIdField, $m)) {
-            $this->handlePlatformFeeCallback((int) $m[1], (int) $m[2], (int) $m[3], $success, $payload, $notifier);
+        if (preg_match('/^platformfee-order-(\d+)-payment-(\d+)$/', $orderIdField, $m)) {
+            $this->handlePlatformFeeCallback((int) $m[1], (int) $m[2], $success, $payload, $notifier);
 
             return response()->noContent();
         }
@@ -102,7 +101,7 @@ class PaymentController extends Controller
         }
     }
 
-    private function handlePlatformFeeCallback(int $orderId, int $offerId, int $paymentId, bool $success, array $payload, UserNotifier $notifier): void
+    private function handlePlatformFeeCallback(int $orderId, int $paymentId, bool $success, array $payload, UserNotifier $notifier): void
     {
         $payment = Payment::find($paymentId);
 
@@ -121,27 +120,19 @@ class PaymentController extends Controller
         }
 
         $order = Order::find($orderId);
-        $offer = Offer::find($offerId);
 
-        if (! $order || ! $offer || $offer->order_id !== $order->id || $order->status !== Order::STATUS_OPEN) {
+        if (! $order || $order->status !== Order::STATUS_PENDING_PAYMENT) {
             return;
         }
 
-        $offer->update(['status' => Offer::STATUS_ACCEPTED]);
-
-        Offer::where('order_id', $order->id)
-            ->where('id', '!=', $offer->id)
-            ->update(['status' => Offer::STATUS_REJECTED]);
-
         $order->update([
-            'status' => Order::STATUS_IN_PROGRESS,
-            'accepted_offer_id' => $offer->id,
+            'status' => Order::STATUS_OPEN,
             'platform_fee_paid_at' => now(),
         ]);
 
         $notifier->notify(
-            $offer->executor,
-            "✅ Ваш отклик на заказ #{$order->id} \"{$order->title}\" принят! Свяжитесь с заказчиком в чате."
+            $order->customer,
+            "✅ Ваш заказ #{$order->id} \"{$order->title}\" оплачен и опубликован!"
         );
     }
 }

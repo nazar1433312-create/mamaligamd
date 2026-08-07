@@ -89,7 +89,7 @@ Route::get('support/{ticket}', SupportShow::class)->middleware('auth')->name('su
 Route::middleware('auth')->group(function () {
     Route::get('payments/liqpay/checkout/{order}', [PaymentController::class, 'checkout'])
         ->name('payments.liqpay.checkout');
-    Route::get('orders/{order}/offers/{offer}/start', [PlatformFeeController::class, 'checkout'])
+    Route::get('orders/{order}/start', [PlatformFeeController::class, 'checkout'])
         ->name('platform-fee.checkout');
 });
 

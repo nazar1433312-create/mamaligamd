@@ -38,7 +38,7 @@ class TelegramAuthController extends Controller
     /**
      * Handle a one-time magic-link login initiated from the Telegram bot.
      */
-    public function magicLogin(string $token): RedirectResponse
+    public function magicLogin(Request $request, string $token): RedirectResponse
     {
         $loginToken = TelegramLoginToken::where('token', $token)->first();
 
@@ -49,6 +49,12 @@ class TelegramAuthController extends Controller
         $loginToken->update(['used_at' => now()]);
 
         Auth::login($loginToken->user, remember: true);
+
+        $to = $request->query('to');
+
+        if (is_string($to) && str_starts_with($to, '/') && ! str_starts_with($to, '//')) {
+            return redirect($to);
+        }
 
         return redirect()->intended(route('dashboard'));
     }

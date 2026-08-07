@@ -58,8 +58,10 @@
             <input type="text" wire:model="address" class="w-full rounded-md border-gray-300 text-sm">
         </div>
 
+        <p class="text-xs text-gray-400">{{ __('Комиссия платформы') }}: {{ $platformFeeAmount }} MDL — {{ __('оплата откроется на следующем шаге.') }}</p>
+
         <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-md font-medium hover:bg-indigo-700">
-            {{ __('Опубликовать заказ') }}
+            {{ __('Опубликовать заказ') }} — {{ $platformFeeAmount }} MDL
         </button>
     </form>
 </div>

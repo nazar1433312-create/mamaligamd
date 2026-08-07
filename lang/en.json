@@ -31,6 +31,7 @@
     "Город": "City",
     "Не указан / онлайн": "Not specified / online",
     "Адрес (необязательно)": "Address (optional)",
+    "Pending_payment": "Pending payment",
     "Open": "Open",
     "In_progress": "In progress",
     "Completed": "Completed",
@@ -158,5 +159,9 @@
     "Комиссия платформы": "Platform fee",
     "оплачивается при выборе исполнителя.": "is paid when you choose a specialist.",
     "Редактировать заказ": "Edit order",
-    "Сохранить изменения": "Save changes"
+    "Сохранить изменения": "Save changes",
+    "Заказ ещё не опубликован": "Order not published yet",
+    "оплатите, чтобы заказ стал виден исполнителям.": "pay so the order becomes visible to specialists.",
+    "и опубликовать": "and publish",
+    "оплата откроется на следующем шаге.": "payment will open on the next step."
 }

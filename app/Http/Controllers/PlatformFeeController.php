@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\LiqPay\LiqPayClient;
@@ -11,12 +10,10 @@ use Illuminate\View\View;
 
 class PlatformFeeController extends Controller
 {
-    public function checkout(Order $order, Offer $offer, LiqPayClient $liqPay): View
+    public function checkout(Order $order, LiqPayClient $liqPay): View
     {
         abort_unless($order->customer_id === Auth::id(), 403);
-        abort_unless($order->status === Order::STATUS_OPEN, 403, 'Заказ уже не открыт.');
-        abort_unless($offer->order_id === $order->id, 404);
-        abort_unless($offer->status === Offer::STATUS_PENDING, 403, 'Этот отклик уже неактуален.');
+        abort_unless($order->status === Order::STATUS_PENDING_PAYMENT, 403, 'Заказ уже опубликован или недоступен.');
 
         $amount = (float) config('services.platform.fee_amount');
 
@@ -31,8 +28,8 @@ class PlatformFeeController extends Controller
             'action' => 'pay',
             'amount' => $amount,
             'currency' => 'MDL',
-            'description' => "Комиссия платформы за заказ #{$order->id}: {$order->title}",
-            'order_id' => "platformfee-order-{$order->id}-offer-{$offer->id}-payment-{$payment->id}",
+            'description' => "Публикация заказа: {$order->title}",
+            'order_id' => "platformfee-order-{$order->id}-payment-{$payment->id}",
             'result_url' => route('orders.show', $order),
             'server_url' => route('payments.liqpay.callback'),
             'sandbox' => config('services.liqpay.sandbox') ? 1 : 0,
