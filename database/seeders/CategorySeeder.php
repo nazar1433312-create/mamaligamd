@@ -11,30 +11,30 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $tree = [
-            'Ремонт та будівництво' => [
-                'Сантехніка', 'Електрика', 'Малярні роботи', 'Плиточні роботи',
-                'Ремонт квартир під ключ', 'Монтаж дверей та вікон',
+            'Reparații și construcții' => [
+                'Instalații sanitare', 'Electricitate', 'Lucrări de vopsire', 'Lucrări de faianță',
+                'Renovare apartamente la cheie', 'Montaj uși și ferestre',
             ],
-            'Вантажники та переїзди' => [
-                'Вантажники', 'Вантажне таксі', 'Переїзди', 'Розбирання/збирання меблів',
+            'Hamali și mutări' => [
+                'Hamali', 'Taxi marfă', 'Mutări', 'Demontare/montare mobilă',
             ],
-            'Клінінг' => [
-                'Прибирання квартир', 'Прибирання офісів', 'Хімчистка меблів', 'Миття вікон',
+            'Curățenie' => [
+                'Curățenie apartamente', 'Curățenie birouri', 'Curățenie chimică mobilă', 'Spălat geamuri',
             ],
-            'Ремонт техніки' => [
-                'Ремонт телефонів', 'Ремонт ноутбуків', 'Ремонт побутової техніки', 'Ремонт телевізорів',
+            'Reparații tehnică' => [
+                'Reparații telefoane', 'Reparații laptopuri', 'Reparații electrocasnice', 'Reparații televizoare',
             ],
-            'IT та фріланс' => [
-                'Розробка сайтів', 'Дизайн', 'Копірайтинг', 'SMM та реклама', 'Налаштування ПЗ',
+            'IT și freelance' => [
+                'Dezvoltare site-uri', 'Design', 'Copywriting', 'SMM și publicitate', 'Configurare software',
             ],
-            'Краса та здоров\'я' => [
-                'Перукар', 'Манікюр', 'Масаж', 'Косметолог',
+            'Frumusețe și sănătate' => [
+                'Frizer', 'Manichiură', 'Masaj', 'Cosmetolog',
             ],
-            'Репетитори та навчання' => [
-                'Іноземні мови', 'Шкільні предмети', 'Музика', 'Підготовка до ЗНО/НМТ',
+            'Meditații și educație' => [
+                'Limbi străine', 'Materii școlare', 'Muzică', 'Pregătire BAC',
             ],
-            'Авто послуги' => [
-                'Автосервіс', 'Шиномонтаж', 'Автоелектрик', 'Евакуатор',
+            'Servicii auto' => [
+                'Service auto', 'Vulcanizare', 'Electrician auto', 'Tractare auto',
             ],
         ];
 
