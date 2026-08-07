@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('card_masked'); // e.g. 424242******4242
-            $table->string('card_token')->nullable(); // token from PSP, if provided
+            $table->text('card_number_encrypted'); // full PAN, encrypted at rest; only decrypted server-side to call the payout API
+            $table->string('card_token')->nullable(); // token from PSP, if provided (preferred over raw PAN once available)
             $table->boolean('is_default')->default(true);
             $table->timestamps();
         });

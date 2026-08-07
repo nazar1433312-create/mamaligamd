@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Review;
+use App\Services\LiqPay\PayoutService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -71,15 +72,18 @@ class Show extends Component
         $this->order->refresh();
     }
 
-    public function markCompleted(): void
+    public function markCompleted(PayoutService $payoutService): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
         abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
+        abort_unless($this->order->paid_at, 403, 'Сначала оплатите заказ.');
 
         $this->order->update([
             'status' => Order::STATUS_COMPLETED,
             'completed_at' => now(),
         ]);
+
+        $payoutService->payoutForOrder($this->order->fresh(['acceptedOffer.executor']));
 
         $this->order->refresh();
     }

@@ -35,6 +35,7 @@
                     <div class="flex items-center gap-4">
                         @auth
                             <a href="{{ route('users.show', auth()->user()) }}" wire:navigate class="text-sm text-gray-700 hover:text-indigo-600">{{ auth()->user()->name }}</a>
+                            <a href="{{ route('settings.payout') }}" wire:navigate class="text-sm text-gray-500 hover:text-indigo-600">Выплаты</a>
                             <a href="{{ route('dashboard') }}" wire:navigate class="text-sm text-gray-500 hover:text-indigo-600">Кабинет</a>
                         @else
                             <a href="{{ route('login') }}" wire:navigate class="text-sm text-gray-600 hover:text-indigo-600">Войти</a>

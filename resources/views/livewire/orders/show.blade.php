@@ -96,10 +96,18 @@
                 @auth
                     @if ($order->status === 'in_progress' && $order->customer_id === auth()->id())
                         <div class="mt-4">
-                            <button wire:click="markCompleted" wire:confirm="Подтвердить, что работа выполнена?"
-                                class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                                ✅ Работа выполнена
-                            </button>
+                            @if (! $order->paid_at)
+                                <a href="{{ route('payments.liqpay.checkout', $order) }}"
+                                    class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                                    💳 Оплатить {{ $order->acceptedOffer->price }} грн
+                                </a>
+                            @else
+                                <p class="text-sm text-green-700 mb-2">✅ Оплачено</p>
+                                <button wire:click="markCompleted" wire:confirm="Подтвердить, что работа выполнена?"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                                    ✅ Работа выполнена
+                                </button>
+                            @endif
                         </div>
                     @endif
                 @endauth

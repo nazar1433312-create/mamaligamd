@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
@@ -9,6 +10,7 @@ use App\Livewire\Orders\Create as OrdersCreate;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Orders\Show as OrdersShow;
+use App\Livewire\Settings\PayoutSettings;
 use App\Livewire\Users\PublicProfile;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +33,16 @@ Route::get('orders/mine', MyOrders::class)->middleware('auth')->name('orders.my'
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
 Route::get('users/{user}', PublicProfile::class)->name('users.show');
+
+Route::get('settings/payout', PayoutSettings::class)->middleware('auth')->name('settings.payout');
+
+Route::middleware('auth')->group(function () {
+    Route::get('payments/liqpay/checkout/{order}', [PaymentController::class, 'checkout'])
+        ->name('payments.liqpay.checkout');
+});
+
+Route::post('payments/liqpay/callback', [PaymentController::class, 'callback'])
+    ->name('payments.liqpay.callback');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboard::class)->name('dashboard');
