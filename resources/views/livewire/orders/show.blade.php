@@ -30,6 +30,7 @@
                 </span>
                 <span>👤 {{ __('Заказчик') }}:
                     <a href="{{ route('users.show', $order->customer) }}" wire:navigate class="text-indigo-600 hover:underline">{{ $order->customer->name }}</a>
+                    @if ($order->customer->is_verified) <x-verified-badge /> @endif
                 </span>
             </div>
         </div>
@@ -65,6 +66,7 @@
                         <div class="flex items-center justify-between p-3 border border-gray-200 rounded-md">
                             <div>
                                 <a href="{{ route('users.show', $offer->executor) }}" wire:navigate class="font-medium text-gray-900 hover:text-indigo-600">{{ $offer->executor->name }}</a>
+                                @if ($offer->executor->is_verified) <x-verified-badge /> @endif
                                 <x-rating-badge :user="$offer->executor" />
                                 <span class="text-sm text-gray-500 ms-2">{{ $offer->price }} MDL</span>
                                 @if ($offer->message)
@@ -92,6 +94,7 @@
                 <a href="{{ route('users.show', $order->acceptedOffer->executor) }}" wire:navigate class="text-indigo-600 hover:underline">
                     {{ $order->acceptedOffer->executor->name }}
                 </a>
+                @if ($order->acceptedOffer->executor->is_verified) <x-verified-badge /> @endif
                 <x-rating-badge :user="$order->acceptedOffer->executor" />
                 <span class="text-sm text-gray-500 ms-2">{{ $order->acceptedOffer->price }} MDL</span>
 
@@ -99,10 +102,18 @@
                     @if ($order->status === 'in_progress' && $order->customer_id === auth()->id())
                         <div class="mt-4">
                             @if (! $order->paid_at)
-                                <a href="{{ route('payments.liqpay.checkout', $order) }}"
-                                    class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                                    💳 {{ __('Оплатить') }} {{ $order->acceptedOffer->price }} MDL
-                                </a>
+                                @if (auth()->user()->is_verified)
+                                    <a href="{{ route('payments.liqpay.checkout', $order) }}"
+                                        class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                                        💳 {{ __('Оплатить') }} {{ $order->acceptedOffer->price }} MDL
+                                    </a>
+                                @else
+                                    <p class="text-sm text-amber-700 mb-2">{{ __('Для оплаты картой нужно пройти верификацию.') }}</p>
+                                    <a href="{{ route('settings.verification') }}" wire:navigate
+                                        class="inline-block bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-amber-600">
+                                        🪪 {{ __('Пройти верификацию') }}
+                                    </a>
+                                @endif
                             @else
                                 <p class="text-sm text-green-700 mb-2">✅ {{ __('Оплачено') }}</p>
                                 <button wire:click="markCompleted" wire:confirm="{{ __('Подтвердить, что работа выполнена?') }}"

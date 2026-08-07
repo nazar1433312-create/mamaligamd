@@ -5,7 +5,10 @@
                 {{ mb_substr($user->name, 0, 1) }}
             </div>
             <div>
-                <h1 class="text-xl font-bold">{{ $user->name }}</h1>
+                <h1 class="text-xl font-bold flex items-center gap-1.5">
+                    {{ $user->name }}
+                    @if ($user->is_verified) <x-verified-badge /> @endif
+                </h1>
                 <div class="text-sm text-gray-500">
                     ⭐ {{ number_format($user->rating_avg, 1) }} ({{ $user->rating_count }} {{ __('отзывов') }})
                     @if ($user->city) · 📍 {{ $user->city->name }} @endif

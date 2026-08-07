@@ -19,6 +19,7 @@ class PaymentController extends Controller
         abort_unless($order->customer_id === Auth::id(), 403);
         abort_unless($order->status === Order::STATUS_IN_PROGRESS, 403, 'Заказ не готов к оплате.');
         abort_if($order->paid_at, 403, 'Заказ уже оплачен.');
+        abort_unless(Auth::user()->is_verified, 403, 'Для оплаты картой нужно пройти верификацию.');
 
         $amount = $order->acceptedOffer->price;
 

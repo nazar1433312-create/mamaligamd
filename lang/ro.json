@@ -97,5 +97,17 @@
     "Переключиться на заказчика": "Comută pe client",
     "Переключиться на исполнителя": "Comută pe executant",
     "Завершено": "Finalizate",
-    "Все заказы": "Toate comenzile"
+    "Все заказы": "Toate comenzile",
+    "Верификация": "Verificare",
+    "Проверено": "Verificat",
+    "Подтвердите личность, чтобы получить галочку \"Проверено\" и открыть оплату картой. Загрузите фото документа (паспорт/ID) — данные видит только администратор.": "Confirmă-ți identitatea pentru a primi bifa \"Verificat\" și a debloca plata cu cardul. Încarcă o poză a actului (buletin/pașaport) — datele sunt vizibile doar administratorului.",
+    "Вы верифицированы.": "Ești verificat.",
+    "Заявка на рассмотрении. Обычно проверка занимает до 24 часов.": "Cererea este în curs de examinare. De obicei verificarea durează până la 24 de ore.",
+    "Предыдущая заявка отклонена.": "Cererea anterioară a fost respinsă.",
+    "Попробуйте загрузить документы ещё раз.": "Încearcă să încarci documentele din nou.",
+    "Фото документа (1–3 файла)": "Poză act (1–3 fișiere)",
+    "Загрузка...": "Se încarcă...",
+    "Отправить на проверку": "Trimite spre verificare",
+    "Для оплаты картой нужно пройти верификацию.": "Pentru plata cu cardul este necesară verificarea.",
+    "Пройти верификацию": "Treci verificarea"
 }

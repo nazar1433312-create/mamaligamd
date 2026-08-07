@@ -53,7 +53,13 @@
                         <x-language-switcher />
 
                         @auth
-                            <a href="{{ route('users.show', auth()->user()) }}" wire:navigate class="hidden sm:inline text-sm text-gray-700 hover:text-indigo-600">{{ auth()->user()->name }}</a>
+                            <a href="{{ route('users.show', auth()->user()) }}" wire:navigate class="hidden sm:inline-flex items-center gap-1 text-sm text-gray-700 hover:text-indigo-600">
+                                {{ auth()->user()->name }}
+                                @if(auth()->user()->is_verified) <x-verified-badge /> @endif
+                            </a>
+                            @unless(auth()->user()->is_verified)
+                                <a href="{{ route('settings.verification') }}" wire:navigate class="hidden sm:inline text-sm text-amber-600 hover:text-amber-700">{{ __('Верификация') }}</a>
+                            @endunless
                             <a href="{{ route('settings.payout') }}" wire:navigate class="hidden sm:inline text-sm text-gray-500 hover:text-indigo-600">{{ __('Выплаты') }}</a>
                             <a href="{{ route('dashboard') }}" wire:navigate class="text-sm text-gray-500 hover:text-indigo-600">{{ __('Кабинет') }}</a>
                         @else

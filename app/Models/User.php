@@ -36,6 +36,7 @@ class User extends Authenticatable
             'is_executor' => 'boolean',
             'is_admin' => 'boolean',
             'is_banned' => 'boolean',
+            'is_verified' => 'boolean',
             'rating_avg' => 'decimal:2',
         ];
     }
@@ -68,5 +69,10 @@ class User extends Authenticatable
     public function reviewsWritten(): HasMany
     {
         return $this->hasMany(Review::class, 'author_id');
+    }
+
+    public function verificationRequests(): HasMany
+    {
+        return $this->hasMany(VerificationRequest::class);
     }
 }

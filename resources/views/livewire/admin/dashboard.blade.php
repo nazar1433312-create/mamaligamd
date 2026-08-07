@@ -25,5 +25,6 @@
         <a href="{{ route('admin.categories') }}" wire:navigate class="text-indigo-600 hover:underline">Категории →</a>
         <a href="{{ route('admin.orders') }}" wire:navigate class="text-indigo-600 hover:underline">Заказы →</a>
         <a href="{{ route('admin.support') }}" wire:navigate class="text-indigo-600 hover:underline">Поддержка →</a>
+        <a href="{{ route('admin.verifications') }}" wire:navigate class="text-indigo-600 hover:underline">Верификации →</a>
     </div>
 </div>
