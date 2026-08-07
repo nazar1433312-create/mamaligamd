@@ -13,9 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Our nginx reverse proxy always runs on the same host (127.0.0.1),
-        // so it's safe to trust it for X-Forwarded-* headers (scheme, IP, host).
-        $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+        // PHP-FPM is never reachable from outside Docker's internal network (only the
+        // host nginx reverse proxy can reach it), and thanks to Docker's NAT the
+        // container sees the proxy's connection from an internal bridge IP rather
+        // than 127.0.0.1, so we trust all connections for X-Forwarded-* headers.
+        $middleware->trustProxies(at: '*');
 
         $middleware->validateCsrfTokens(except: [
             'telegram/webhook/*',
