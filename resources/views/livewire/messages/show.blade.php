@@ -2,9 +2,17 @@
     <a href="{{ route('messages.inbox') }}" wire:navigate class="text-sm text-gray-500 hover:text-indigo-600">← {{ __('Сообщения') }}</a>
 
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col h-[32rem] mt-3" wire:poll.5s>
-        <div class="p-4 border-b border-gray-200 font-semibold text-sm flex items-center gap-1.5">
-            <a href="{{ route('users.show', $otherUser) }}" wire:navigate class="hover:text-indigo-600">{{ $otherUser->name }}</a>
-            @if ($otherUser->is_verified) <x-verified-badge /> @endif
+        <div class="p-4 border-b border-gray-200 font-semibold text-sm flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+                <a href="{{ route('users.show', $otherUser) }}" wire:navigate class="hover:text-indigo-600">{{ $otherUser->name }}</a>
+                @if ($otherUser->is_verified) <x-verified-badge /> @endif
+            </div>
+            <button type="button"
+                onclick="MamaligaCall.start({{ $otherUser->id }}, '{{ addslashes($otherUser->name) }}')"
+                title="{{ __('Позвонить') }}"
+                class="text-indigo-600 hover:text-indigo-800">
+                📞
+            </button>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-3">
             @forelse ($messages as $msg)

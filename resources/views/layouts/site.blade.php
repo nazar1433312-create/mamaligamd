@@ -86,6 +86,12 @@
             {{ $slot }}
         </main>
 
+        @auth
+            @persist('call-widget')
+                <x-call-widget />
+            @endpersist
+        @endauth
+
         <footer class="mt-16 border-t border-gray-200 bg-white">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-4">
                 <span>© {{ date('Y') }} {{ config('app.name') }} — {{ __('услуги по всей Молдове') }}</span>

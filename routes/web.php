@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\VerificationDocumentController;
+use App\Http\Controllers\CallController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Livewire\Admin\Categories as AdminCategories;
@@ -61,6 +62,18 @@ Route::get('users/{user}', PublicProfile::class)->name('users.show');
 Route::middleware('auth')->group(function () {
     Route::get('messages', MessagesInbox::class)->name('messages.inbox');
     Route::get('messages/{user}', MessagesShow::class)->name('messages.show');
+});
+
+Route::middleware('auth')->prefix('calls')->name('calls.')->group(function () {
+    Route::get('incoming', [CallController::class, 'incoming'])->name('incoming');
+    Route::post('/', [CallController::class, 'store'])->name('store');
+    Route::get('{call}', [CallController::class, 'show'])->name('show');
+    Route::post('{call}/offer', [CallController::class, 'offer'])->name('offer');
+    Route::post('{call}/answer', [CallController::class, 'answer'])->name('answer');
+    Route::post('{call}/decline', [CallController::class, 'decline'])->name('decline');
+    Route::post('{call}/end', [CallController::class, 'end'])->name('end');
+    Route::post('{call}/candidate', [CallController::class, 'storeCandidate'])->name('candidate');
+    Route::get('{call}/candidates', [CallController::class, 'candidates'])->name('candidates');
 });
 
 Route::get('settings/payout', PayoutSettings::class)->middleware('auth')->name('settings.payout');
