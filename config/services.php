@@ -47,4 +47,8 @@ return [
         'sandbox' => env('LIQPAY_SANDBOX', true),
     ],
 
+    'platform' => [
+        'commission_percent' => env('PLATFORM_COMMISSION_PERCENT', 12),
+    ],
+
 ];
