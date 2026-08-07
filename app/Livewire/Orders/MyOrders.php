@@ -28,7 +28,6 @@ class MyOrders extends Component
             'budget_min' => $order->budget_min,
             'budget_max' => $order->budget_max,
             'status' => Order::STATUS_OPEN,
-            'commission_percent' => config('services.platform.commission_percent'),
         ]);
 
         return $this->redirect(route('orders.show', $new), navigate: true);

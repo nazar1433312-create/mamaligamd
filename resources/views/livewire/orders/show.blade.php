@@ -51,9 +51,12 @@
         {{-- Offers --}}
         @if ($order->status === 'open')
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h2 class="font-semibold mb-4">{{ __('Отклики') }} ({{ $offers->count() }})</h2>
+                <h2 class="font-semibold mb-1">{{ __('Отклики') }} ({{ $offers->count() }})</h2>
 
                 @auth
+                    @if ($order->customer_id === auth()->id())
+                        <p class="text-xs text-gray-400 mb-4">{{ __('Комиссия платформы') }}: {{ $platformFeeAmount }} MDL — {{ __('оплачивается при выборе исполнителя.') }}</p>
+                    @endif
                     @if ($order->customer_id !== auth()->id())
                         <div class="mb-6 p-4 bg-gray-50 rounded-md">
                             @if ($myOffer)
@@ -88,8 +91,10 @@
                             </div>
                             @auth
                                 @if ($order->customer_id === auth()->id())
-                                    <button wire:click="acceptOffer({{ $offer->id }})" wire:confirm="{{ __('Выбрать этого исполнителя?') }}"
-                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700">{{ __('Выбрать') }}</button>
+                                    <a href="{{ route('platform-fee.checkout', [$order, $offer]) }}"
+                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700">
+                                        {{ __('В работе') }} — {{ $platformFeeAmount }} MDL
+                                    </a>
                                 @endif
                             @endauth
                         </div>

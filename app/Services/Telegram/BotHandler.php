@@ -357,7 +357,6 @@ class BotHandler
             'description' => $d['description'],
             'budget_min' => $budgetMin,
             'budget_max' => $budgetMax,
-            'commission_percent' => config('services.platform.commission_percent'),
         ]);
 
         $this->clearState($chatId);

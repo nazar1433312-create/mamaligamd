@@ -49,7 +49,7 @@ return [
     ],
 
     'platform' => [
-        'commission_percent' => env('PLATFORM_COMMISSION_PERCENT', 12),
+        'fee_amount' => env('PLATFORM_FEE_AMOUNT', 50),
     ],
 
     'admin_gate' => [

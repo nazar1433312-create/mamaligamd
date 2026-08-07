@@ -30,6 +30,18 @@ class Orders extends Component
         Order::whereKey($orderId)->update(['status' => $status]);
     }
 
+    public function deleteOrder(int $orderId): void
+    {
+        Order::whereKey($orderId)->delete();
+        $this->resetPage();
+    }
+
+    public function deleteAll(): void
+    {
+        Order::query()->delete();
+        $this->resetPage();
+    }
+
     public function render()
     {
         $orders = Order::query()

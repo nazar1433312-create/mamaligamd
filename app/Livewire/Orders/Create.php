@@ -46,7 +46,6 @@ class Create extends Component
         $order = Order::create([
             ...$data,
             'customer_id' => Auth::id(),
-            'commission_percent' => config('services.platform.commission_percent'),
         ]);
 
         session()->flash('status', 'Заказ опубликован!');

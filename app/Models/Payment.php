@@ -18,6 +18,8 @@ class Payment extends Model
 
     const TYPE_REFUND = 'refund';
 
+    const TYPE_PLATFORM_FEE = 'platform_fee';
+
     const STATUS_PENDING = 'pending';
 
     const STATUS_SUCCESS = 'success';

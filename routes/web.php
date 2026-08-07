@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\VerificationDocumentController;
 use App\Http\Controllers\CallController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PlatformFeeController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
@@ -86,6 +87,8 @@ Route::get('support/{ticket}', SupportShow::class)->middleware('auth')->name('su
 Route::middleware('auth')->group(function () {
     Route::get('payments/liqpay/checkout/{order}', [PaymentController::class, 'checkout'])
         ->name('payments.liqpay.checkout');
+    Route::get('orders/{order}/offers/{offer}/start', [PlatformFeeController::class, 'checkout'])
+        ->name('platform-fee.checkout');
 });
 
 Route::post('payments/liqpay/callback', [PaymentController::class, 'callback'])

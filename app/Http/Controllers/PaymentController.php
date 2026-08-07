@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\LiqPay\LiqPayClient;
@@ -57,21 +58,32 @@ class PaymentController extends Controller
         }
 
         $payload = $liqPay->decode($data);
+        $orderIdField = $payload['order_id'] ?? '';
+        $status = $payload['status'] ?? 'unknown';
+        $success = in_array($status, ['success', 'sandbox'], true);
 
-        if (! preg_match('/^order-(\d+)-payment-(\d+)$/', $payload['order_id'] ?? '', $m)) {
+        if (preg_match('/^platformfee-order-(\d+)-offer-(\d+)-payment-(\d+)$/', $orderIdField, $m)) {
+            $this->handlePlatformFeeCallback((int) $m[1], (int) $m[2], (int) $m[3], $success, $payload, $notifier);
+
             return response()->noContent();
         }
 
-        [$orderId, $paymentId] = [(int) $m[1], (int) $m[2]];
+        if (preg_match('/^order-(\d+)-payment-(\d+)$/', $orderIdField, $m)) {
+            $this->handleJobPaymentCallback((int) $m[1], (int) $m[2], $success, $payload, $notifier);
 
+            return response()->noContent();
+        }
+
+        return response()->noContent();
+    }
+
+    private function handleJobPaymentCallback(int $orderId, int $paymentId, bool $success, array $payload, UserNotifier $notifier): void
+    {
         $payment = Payment::find($paymentId);
 
         if (! $payment || $payment->order_id !== $orderId) {
-            return response()->noContent();
+            return;
         }
-
-        $status = $payload['status'] ?? 'unknown';
-        $success = in_array($status, ['success', 'sandbox'], true);
 
         $payment->update([
             'status' => $success ? Payment::STATUS_SUCCESS : Payment::STATUS_FAILED,
@@ -88,7 +100,48 @@ class PaymentController extends Controller
                 "💳 Оплата картой по заказу #{$order->id} \"{$order->title}\" прошла успешно."
             );
         }
+    }
 
-        return response()->noContent();
+    private function handlePlatformFeeCallback(int $orderId, int $offerId, int $paymentId, bool $success, array $payload, UserNotifier $notifier): void
+    {
+        $payment = Payment::find($paymentId);
+
+        if (! $payment || $payment->order_id !== $orderId) {
+            return;
+        }
+
+        $payment->update([
+            'status' => $success ? Payment::STATUS_SUCCESS : Payment::STATUS_FAILED,
+            'provider_payment_id' => (string) ($payload['payment_id'] ?? ''),
+            'raw_response' => $payload,
+        ]);
+
+        if (! $success) {
+            return;
+        }
+
+        $order = Order::find($orderId);
+        $offer = Offer::find($offerId);
+
+        if (! $order || ! $offer || $offer->order_id !== $order->id || $order->status !== Order::STATUS_OPEN) {
+            return;
+        }
+
+        $offer->update(['status' => Offer::STATUS_ACCEPTED]);
+
+        Offer::where('order_id', $order->id)
+            ->where('id', '!=', $offer->id)
+            ->update(['status' => Offer::STATUS_REJECTED]);
+
+        $order->update([
+            'status' => Order::STATUS_IN_PROGRESS,
+            'accepted_offer_id' => $offer->id,
+            'platform_fee_paid_at' => now(),
+        ]);
+
+        $notifier->notify(
+            $offer->executor,
+            "✅ Ваш отклик на заказ #{$order->id} \"{$order->title}\" принят! Свяжитесь с заказчиком в чате."
+        );
     }
 }

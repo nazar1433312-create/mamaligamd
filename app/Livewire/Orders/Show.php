@@ -58,32 +58,6 @@ class Show extends Component
         $this->order->refresh();
     }
 
-    public function acceptOffer(int $offerId, UserNotifier $notifier): void
-    {
-        abort_unless($this->order->customer_id === Auth::id(), 403);
-        abort_unless($this->order->status === Order::STATUS_OPEN, 403);
-
-        $offer = Offer::where('order_id', $this->order->id)->findOrFail($offerId);
-
-        $offer->update(['status' => Offer::STATUS_ACCEPTED]);
-
-        Offer::where('order_id', $this->order->id)
-            ->where('id', '!=', $offer->id)
-            ->update(['status' => Offer::STATUS_REJECTED]);
-
-        $this->order->update([
-            'status' => Order::STATUS_IN_PROGRESS,
-            'accepted_offer_id' => $offer->id,
-        ]);
-
-        $notifier->notify(
-            $offer->executor,
-            "✅ Ваш отклик на заказ #{$this->order->id} \"{$this->order->title}\" принят! Свяжитесь с заказчиком в чате."
-        );
-
-        $this->order->refresh();
-    }
-
     public function payCash(UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
@@ -221,6 +195,7 @@ class Show extends Component
             'messages' => $messages,
             'canChat' => (bool) $this->chatPartnerId(),
             'myReview' => $myReview,
+            'platformFeeAmount' => config('services.platform.fee_amount'),
         ]);
     }
 }

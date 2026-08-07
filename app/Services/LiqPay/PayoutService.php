@@ -13,7 +13,9 @@ class PayoutService
     ) {}
 
     /**
-     * Pay out the executor for a completed order, withholding the platform commission.
+     * Pay out the executor the full accepted-offer price for a completed order.
+     * The platform's commission is already collected upfront as the fixed
+     * platform fee the customer pays when starting the job — nothing is withheld here.
      * Returns the created Payment record, or null if no payout method is on file.
      */
     public function payoutForOrder(Order $order): ?Payment
@@ -27,22 +29,18 @@ class PayoutService
             return null;
         }
 
-        $grossAmount = (float) $order->acceptedOffer->price;
-        $commissionPercent = (float) ($order->commission_percent ?? config('services.platform.commission_percent'));
-        $commissionAmount = round($grossAmount * $commissionPercent / 100, 2);
-        $netAmount = round($grossAmount - $commissionAmount, 2);
+        $amount = (float) $order->acceptedOffer->price;
 
         $payment = Payment::create([
             'order_id' => $order->id,
             'type' => Payment::TYPE_PAYOUT,
-            'amount' => $netAmount,
-            'commission_amount' => $commissionAmount,
+            'amount' => $amount,
             'status' => Payment::STATUS_PENDING,
         ]);
 
         $response = $this->liqPay->request([
             'action' => 'paytocard',
-            'amount' => $netAmount,
+            'amount' => $amount,
             'currency' => 'MDL',
             'description' => "Выплата за заказ #{$order->id}",
             'order_id' => "payout-order-{$order->id}-payment-{$payment->id}",

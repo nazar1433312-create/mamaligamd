@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'customer_id', 'category_id', 'city_id', 'title', 'description', 'address',
     'budget_min', 'budget_max', 'status', 'accepted_offer_id', 'commission_percent',
+    'platform_fee_paid_at',
 ])]
 class Order extends Model
 {
@@ -30,6 +31,7 @@ class Order extends Model
             'budget_max' => 'decimal:2',
             'commission_percent' => 'decimal:2',
             'paid_at' => 'datetime',
+            'platform_fee_paid_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
         ];

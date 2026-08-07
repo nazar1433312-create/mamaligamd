@@ -1,5 +1,11 @@
 <div>
-    <h1 class="text-2xl font-bold mb-6">Заказы</h1>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold">Заказы</h1>
+        <button wire:click="deleteAll" wire:confirm="Удалить ВСЕ заказы без возможности восстановления? Это действие для очистки тестовых данных."
+            class="text-xs bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700">
+            🗑 Удалить все заказы
+        </button>
+    </div>
 
     <select wire:model.live="status" class="rounded-md border-gray-300 text-sm mb-4">
         <option value="">Все статусы</option>
@@ -40,6 +46,7 @@
                                     <button wire:click="forceCancel({{ $order->id }})" wire:confirm="Отменить заказ?" class="text-xs text-red-600 hover:underline">Отменить</button>
                                 @endif
                             @endif
+                            <button wire:click="deleteOrder({{ $order->id }})" wire:confirm="Удалить заказ #{{ $order->id }} без возможности восстановления?" class="text-xs text-red-600 hover:underline">Удалить</button>
                         </td>
                     </tr>
                 @endforeach
