@@ -1,8 +1,10 @@
 @php
     $languages = [
+        'en' => 'EN',
         'ro' => 'RO',
         'ru' => 'RU',
         'uk' => 'UA',
+        'hi' => 'HI',
     ];
 @endphp
 
@@ -17,7 +19,7 @@
         @foreach ($languages as $code => $label)
             <a href="{{ route('lang.switch', $code) }}"
                class="block px-3 py-1.5 hover:bg-gray-50 {{ app()->getLocale() === $code ? 'text-indigo-600 font-medium' : 'text-gray-700' }}">
-                {{ $label }} — {{ ['ro' => 'Română', 'ru' => 'Русский', 'uk' => 'Українська'][$code] }}
+                {{ $label }} — {{ ['en' => 'English', 'ro' => 'Română', 'ru' => 'Русский', 'uk' => 'Українська', 'hi' => 'हिन्दी'][$code] }}
             </a>
         @endforeach
     </div>

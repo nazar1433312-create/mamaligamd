@@ -13,6 +13,9 @@
                     ])>{{ __(ucfirst($order->status)) }}</span>
                     @auth
                         <livewire:orders.favorite-button :order="$order" :key="'fav-'.$order->id" />
+                        @if ($order->status === 'open' && $order->customer_id === auth()->id())
+                            <a href="{{ route('orders.edit', $order) }}" wire:navigate class="text-sm text-gray-400 hover:text-indigo-600">✏️</a>
+                        @endif
                     @endauth
                 </div>
             </div>

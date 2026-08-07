@@ -12,6 +12,7 @@ use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\Verifications as AdminVerifications;
 use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Orders\Create as OrdersCreate;
+use App\Livewire\Orders\Edit as OrdersEdit;
 use App\Livewire\Orders\Favorites as OrdersFavorites;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Orders\MyOrders;
@@ -55,6 +56,7 @@ Route::get('orders/create', OrdersCreate::class)->middleware('auth')->name('orde
 Route::get('orders/mine', MyOrders::class)->middleware('auth')->name('orders.my');
 Route::get('orders/favorites', OrdersFavorites::class)->middleware('auth')->name('orders.favorites');
 Route::get('executor', ExecutorDashboard::class)->middleware('auth')->name('executor.dashboard');
+Route::get('orders/{order}/edit', OrdersEdit::class)->middleware('auth')->name('orders.edit');
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
 Route::get('specialists', UsersDirectory::class)->name('users.directory');
