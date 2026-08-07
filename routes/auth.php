@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\TelegramAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -16,7 +17,14 @@ Route::middleware('guest')->group(function () {
 
     Volt::route('reset-password/{token}', 'pages.auth.reset-password')
         ->name('password.reset');
+
+    Route::get('auth/telegram/callback', [TelegramAuthController::class, 'widgetCallback'])
+        ->name('telegram.callback');
 });
+
+Route::get('auth/telegram/{token}', [TelegramAuthController::class, 'magicLogin'])
+    ->middleware('throttle:20,1')
+    ->name('telegram.magic-login');
 
 Route::middleware('auth')->group(function () {
     Volt::route('verify-email', 'pages.auth.verify-email')
