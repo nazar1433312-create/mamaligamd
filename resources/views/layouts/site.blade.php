@@ -48,6 +48,11 @@
                                     🔧 {{ __('Исполнитель') }}
                                 </a>
                             </div>
+
+                            <a href="{{ route('messages.inbox') }}" wire:navigate title="{{ __('Сообщения') }}"
+                               class="text-gray-500 hover:text-indigo-600 {{ request()->routeIs('messages.*') ? 'text-indigo-700' : '' }}">
+                                💬
+                            </a>
                         @endauth
 
                         <x-language-switcher />

@@ -52,4 +52,9 @@ return [
         'commission_percent' => env('PLATFORM_COMMISSION_PERCENT', 12),
     ],
 
+    'admin_gate' => [
+        'username' => env('ADMIN_GATE_USERNAME', 'admin'),
+        'password' => env('ADMIN_GATE_PASSWORD', 'admin'),
+    ],
+
 ];

@@ -109,5 +109,22 @@
     "Загрузка...": "Se încarcă...",
     "Отправить на проверку": "Trimite spre verificare",
     "Для оплаты картой нужно пройти верификацию.": "Pentru plata cu cardul este necesară verificarea.",
-    "Пройти верификацию": "Treci verificarea"
+    "Пройти верификацию": "Treci verificarea",
+    "Способ оплаты": "Metoda de plată",
+    "Картой": "Cu cardul",
+    "Картой (нужна верификация)": "Cu cardul (necesită verificare)",
+    "Наличными": "Cash",
+    "Подтвердить оплату наличными исполнителю?": "Confirmi plata cash către executant?",
+    "День": "Zi",
+    "Неделя": "Săptămână",
+    "Месяц": "Lună",
+    "Год": "An",
+    "Завершено за период": "Finalizate în perioadă",
+    "Заработано за период": "Câștigat în perioadă",
+    "История выполненных работ": "Istoricul lucrărilor finalizate",
+    "за период": "pentru perioadă",
+    "Нет завершённых работ за выбранный период.": "Nu sunt lucrări finalizate în perioada selectată.",
+    "Всего завершено за всё время": "Total finalizate dintotdeauna",
+    "Написать": "Scrie",
+    "Сообщения": "Mesaje"
 }

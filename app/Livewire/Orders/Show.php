@@ -5,6 +5,7 @@ namespace App\Livewire\Orders;
 use App\Models\Message;
 use App\Models\Offer;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Review;
 use App\Services\LiqPay\PayoutService;
 use Illuminate\Support\Facades\Auth;
@@ -72,6 +73,24 @@ class Show extends Component
         $this->order->refresh();
     }
 
+    public function payCash(): void
+    {
+        abort_unless($this->order->customer_id === Auth::id(), 403);
+        abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
+        abort_if($this->order->paid_at, 403);
+
+        Payment::create([
+            'order_id' => $this->order->id,
+            'type' => Payment::TYPE_CHARGE,
+            'provider' => 'cash',
+            'amount' => $this->order->acceptedOffer->price,
+            'status' => Payment::STATUS_SUCCESS,
+        ]);
+
+        $this->order->update(['paid_at' => now()]);
+        $this->order->refresh();
+    }
+
     public function markCompleted(PayoutService $payoutService): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
@@ -83,7 +102,17 @@ class Show extends Component
             'completed_at' => now(),
         ]);
 
-        $payoutService->payoutForOrder($this->order->fresh(['acceptedOffer.executor']));
+        $wasPaidByCard = Payment::where('order_id', $this->order->id)
+            ->where('type', Payment::TYPE_CHARGE)
+            ->where('status', Payment::STATUS_SUCCESS)
+            ->where('provider', '!=', 'cash')
+            ->exists();
+
+        // Cash orders are settled directly between customer and executor —
+        // no platform-held funds to pay out, so we skip the payout call.
+        if ($wasPaidByCard) {
+            $payoutService->payoutForOrder($this->order->fresh(['acceptedOffer.executor']));
+        }
 
         $this->order->refresh();
     }

@@ -14,6 +14,8 @@ use App\Livewire\Orders\MyOrders;
 use App\Livewire\Orders\Show as OrdersShow;
 use App\Livewire\Admin\Support as AdminSupport;
 use App\Livewire\Executor\Dashboard as ExecutorDashboard;
+use App\Livewire\Messages\Inbox as MessagesInbox;
+use App\Livewire\Messages\Show as MessagesShow;
 use App\Livewire\Settings\PayoutSettings;
 use App\Livewire\Settings\Verification as VerificationSettings;
 use App\Livewire\Support\Create as SupportCreate;
@@ -51,6 +53,11 @@ Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
 Route::get('users/{user}', PublicProfile::class)->name('users.show');
 
+Route::middleware('auth')->group(function () {
+    Route::get('messages', MessagesInbox::class)->name('messages.inbox');
+    Route::get('messages/{user}', MessagesShow::class)->name('messages.show');
+});
+
 Route::get('settings/payout', PayoutSettings::class)->middleware('auth')->name('settings.payout');
 Route::get('settings/verification', VerificationSettings::class)->middleware('auth')->name('settings.verification');
 
@@ -66,7 +73,7 @@ Route::middleware('auth')->group(function () {
 Route::post('payments/liqpay/callback', [PaymentController::class, 'callback'])
     ->name('payments.liqpay.callback');
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['admin.gate', 'auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboard::class)->name('dashboard');
     Route::get('users', AdminUsers::class)->name('users');
     Route::get('categories', AdminCategories::class)->name('categories');

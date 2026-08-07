@@ -102,18 +102,24 @@
                     @if ($order->status === 'in_progress' && $order->customer_id === auth()->id())
                         <div class="mt-4">
                             @if (! $order->paid_at)
-                                @if (auth()->user()->is_verified)
-                                    <a href="{{ route('payments.liqpay.checkout', $order) }}"
-                                        class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                                        💳 {{ __('Оплатить') }} {{ $order->acceptedOffer->price }} MDL
-                                    </a>
-                                @else
-                                    <p class="text-sm text-amber-700 mb-2">{{ __('Для оплаты картой нужно пройти верификацию.') }}</p>
-                                    <a href="{{ route('settings.verification') }}" wire:navigate
-                                        class="inline-block bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-amber-600">
-                                        🪪 {{ __('Пройти верификацию') }}
-                                    </a>
-                                @endif
+                                <p class="text-sm font-medium text-gray-700 mb-2">{{ __('Способ оплаты') }}:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @if (auth()->user()->is_verified)
+                                        <a href="{{ route('payments.liqpay.checkout', $order) }}"
+                                            class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                                            💳 {{ __('Картой') }} — {{ $order->acceptedOffer->price }} MDL
+                                        </a>
+                                    @else
+                                        <a href="{{ route('settings.verification') }}" wire:navigate
+                                            class="inline-block bg-gray-100 text-gray-500 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
+                                            🪪 {{ __('Картой (нужна верификация)') }}
+                                        </a>
+                                    @endif
+                                    <button wire:click="payCash" wire:confirm="{{ __('Подтвердить оплату наличными исполнителю?') }}"
+                                        class="inline-block bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50">
+                                        💵 {{ __('Наличными') }} — {{ $order->acceptedOffer->price }} MDL
+                                    </button>
+                                </div>
                             @else
                                 <p class="text-sm text-green-700 mb-2">✅ {{ __('Оплачено') }}</p>
                                 <button wire:click="markCompleted" wire:confirm="{{ __('Подтвердить, что работа выполнена?') }}"
