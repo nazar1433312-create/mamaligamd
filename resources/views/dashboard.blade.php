@@ -12,6 +12,7 @@
                     <a href="{{ route('orders.index') }}" wire:navigate class="text-indigo-600 hover:underline">Заказы →</a>
                     <a href="{{ route('orders.my') }}" wire:navigate class="text-indigo-600 hover:underline">Мои заказы →</a>
                     <a href="{{ route('orders.create') }}" wire:navigate class="text-indigo-600 hover:underline">Опубликовать заказ →</a>
+                    <a href="{{ route('executor.dashboard') }}" wire:navigate class="text-indigo-600 hover:underline">Панель исполнителя →</a>
                     @if(auth()->user()->is_admin)
                         <a href="{{ route('admin.dashboard') }}" wire:navigate class="text-indigo-600 hover:underline">Админка →</a>
                     @endif

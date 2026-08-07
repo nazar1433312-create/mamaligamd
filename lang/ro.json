@@ -80,5 +80,22 @@
     "Обращение": "Solicitare",
     "Статус": "Status",
     "Вы": "Tu",
-    "отзывов": "recenzii"
+    "отзывов": "recenzii",
+    "Активные": "Active",
+    "История": "Istoric",
+    "Нет активных заказов.": "Nu ai comenzi active.",
+    "Нет активных работ.": "Nu ai lucrări active.",
+    "Режим": "Mod",
+    "Панель исполнителя": "Panoul executantului",
+    "Активные работы": "Lucrări active",
+    "Заработано": "Câștigat",
+    "Рейтинг": "Rating",
+    "Мои текущие работы": "Lucrările mele curente",
+    "Доступные заказы": "Comenzi disponibile",
+    "Пока нет доступных заказов в вашем режиме.": "Deocamdată nu sunt comenzi disponibile.",
+    "Стать исполнителем": "Devino executant",
+    "Переключиться на заказчика": "Comută pe client",
+    "Переключиться на исполнителя": "Comută pe executant",
+    "Завершено": "Finalizate",
+    "Все заказы": "Toate comenzile"
 }

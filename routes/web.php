@@ -11,6 +11,7 @@ use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Orders\Show as OrdersShow;
 use App\Livewire\Admin\Support as AdminSupport;
+use App\Livewire\Executor\Dashboard as ExecutorDashboard;
 use App\Livewire\Settings\PayoutSettings;
 use App\Livewire\Support\Create as SupportCreate;
 use App\Livewire\Support\MyTickets as SupportMyTickets;
@@ -42,6 +43,7 @@ Route::view('profile', 'profile')
 Route::get('orders', OrdersIndex::class)->name('orders.index');
 Route::get('orders/create', OrdersCreate::class)->middleware('auth')->name('orders.create');
 Route::get('orders/mine', MyOrders::class)->middleware('auth')->name('orders.my');
+Route::get('executor', ExecutorDashboard::class)->middleware('auth')->name('executor.dashboard');
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
 Route::get('users/{user}', PublicProfile::class)->name('users.show');

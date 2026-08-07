@@ -65,6 +65,7 @@
                         <div class="flex items-center justify-between p-3 border border-gray-200 rounded-md">
                             <div>
                                 <a href="{{ route('users.show', $offer->executor) }}" wire:navigate class="font-medium text-gray-900 hover:text-indigo-600">{{ $offer->executor->name }}</a>
+                                <x-rating-badge :user="$offer->executor" />
                                 <span class="text-sm text-gray-500 ms-2">{{ $offer->price }} MDL</span>
                                 @if ($offer->message)
                                     <p class="text-sm text-gray-500 mt-1">{{ $offer->message }}</p>
@@ -91,6 +92,7 @@
                 <a href="{{ route('users.show', $order->acceptedOffer->executor) }}" wire:navigate class="text-indigo-600 hover:underline">
                     {{ $order->acceptedOffer->executor->name }}
                 </a>
+                <x-rating-badge :user="$order->acceptedOffer->executor" />
                 <span class="text-sm text-gray-500 ms-2">{{ $order->acceptedOffer->price }} MDL</span>
 
                 @auth
