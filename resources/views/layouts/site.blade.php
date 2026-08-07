@@ -38,7 +38,7 @@
 
                     <div class="flex items-center gap-3">
                         @auth
-                            <div class="hidden md:flex items-center bg-gray-100 rounded-md p-0.5 text-xs font-medium">
+                            <div class="hidden sm:flex items-center bg-gray-100 rounded-md p-0.5 text-xs font-medium">
                                 <a href="{{ route('orders.my') }}" wire:navigate
                                    class="px-2.5 py-1 rounded {{ request()->routeIs('orders.my') ? 'bg-white shadow text-indigo-700' : 'text-gray-500' }}">
                                     🧑‍💼 {{ __('Заказчик') }}
