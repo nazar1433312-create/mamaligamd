@@ -21,14 +21,22 @@ class Inbox extends Component
             ->latest()
             ->get();
 
+        $unreadCounts = Message::whereNull('order_id')
+            ->where('recipient_id', $userId)
+            ->whereNull('read_at')
+            ->selectRaw('sender_id, count(*) as total')
+            ->groupBy('sender_id')
+            ->pluck('total', 'sender_id');
+
         $conversations = $messages
             ->unique(fn ($m) => $m->sender_id === $userId ? $m->recipient_id : $m->sender_id)
-            ->map(function ($m) use ($userId) {
+            ->map(function ($m) use ($userId, $unreadCounts) {
                 $other = $m->sender_id === $userId ? $m->recipient : $m->sender;
 
                 return [
                     'user' => $other,
                     'last_message' => $m,
+                    'unread' => $unreadCounts->get($other->id, 0),
                 ];
             })
             ->values();
