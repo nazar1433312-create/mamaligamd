@@ -93,6 +93,12 @@
         @endauth
 
         <footer class="mt-16 border-t border-gray-200 bg-white">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <a href="https://t.me/DeliveryMDBOTBOT" target="_blank" rel="noopener"
+                   class="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 text-white text-sm font-medium px-4 py-3 rounded-lg hover:opacity-90 transition">
+                    🚀 {{ __('Доставка по Молдове — попробуй нашего Telegram-бота') }} @DeliveryMDBOTBOT →
+                </a>
+            </div>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-4">
                 <span>© {{ date('Y') }} {{ config('app.name') }} — {{ __('услуги по всей Молдове') }}</span>
                 <a href="{{ route('support.create') }}" wire:navigate class="hover:text-indigo-600">{{ __('Поддержка') }}</a>
