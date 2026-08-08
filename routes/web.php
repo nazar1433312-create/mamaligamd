@@ -13,6 +13,7 @@ use App\Livewire\Admin\Payouts as AdminPayouts;
 use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\Verifications as AdminVerifications;
 use App\Livewire\Admin\Reports as AdminReports;
+use App\Livewire\About;
 use App\Livewire\Game;
 use App\Livewire\Orders\Create as OrdersCreate;
 use App\Livewire\Orders\Edit as OrdersEdit;
@@ -63,6 +64,7 @@ Route::get('orders/{order}/edit', OrdersEdit::class)->middleware('auth')->name('
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
 
 Route::get('game', Game::class)->name('game');
+Route::get('about', About::class)->name('about');
 
 Route::get('specialists', UsersDirectory::class)->name('users.directory');
 Route::get('users/{user}', PublicProfile::class)->name('users.show');
