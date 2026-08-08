@@ -197,5 +197,14 @@
     "Написать в поддержку": "Contact support",
     "Здесь личная переписка с другими пользователями сайта.": "Your private conversations with other users of the site.",
     "Зайдите в профиль специалиста и нажмите «Написать», чтобы начать переписку.": "Open a specialist's profile and tap \"Message\" to start a conversation.",
-    "Напишите первым — ниже есть поле для сообщения.": "Send the first message — the field is right below."
+    "Напишите первым — ниже есть поле для сообщения.": "Send the first message — the field is right below.",
+    "История переписки и звонков": "Chat and call history",
+    "Ваша переписка и звонки хранятся навсегда.": "Your messages and calls are stored forever.",
+    "По умолчанию личные сообщения и звонки старше 30 дней автоматически удаляются. Заплатите один раз, чтобы хранить их навсегда.": "By default, direct messages and calls older than 30 days are deleted automatically. Pay once to keep them forever.",
+    "и хранить навсегда": "and keep forever",
+    "Звонки": "Calls",
+    "Пропущен": "Missed",
+    "Отклонён": "Declined",
+    "Завершён": "Ended",
+    "Звонков пока нет.": "No calls yet."
 }

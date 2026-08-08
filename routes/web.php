@@ -25,8 +25,10 @@ use App\Livewire\Admin\Support as AdminSupport;
 use App\Livewire\Executor\Dashboard as ExecutorDashboard;
 use App\Livewire\Messages\Inbox as MessagesInbox;
 use App\Livewire\Messages\Show as MessagesShow;
+use App\Livewire\Settings\History as HistorySettings;
 use App\Livewire\Settings\PayoutSettings;
 use App\Livewire\Settings\Verification as VerificationSettings;
+use App\Http\Controllers\HistoryUnlockController;
 use App\Livewire\Support\Create as SupportCreate;
 use App\Livewire\Support\MyTickets as SupportMyTickets;
 use App\Livewire\Support\Show as SupportShow;
@@ -88,6 +90,7 @@ Route::middleware('auth')->prefix('calls')->name('calls.')->group(function () {
 
 Route::get('settings/payout', PayoutSettings::class)->middleware('auth')->name('settings.payout');
 Route::get('settings/verification', VerificationSettings::class)->middleware('auth')->name('settings.verification');
+Route::get('settings/history', HistorySettings::class)->middleware('auth')->name('settings.history');
 
 Route::get('support', SupportCreate::class)->name('support.create');
 Route::get('support/mine', SupportMyTickets::class)->middleware('auth')->name('support.my');
@@ -98,6 +101,8 @@ Route::middleware('auth')->group(function () {
         ->name('payments.victoriabank.checkout');
     Route::get('orders/{order}/start', [PlatformFeeController::class, 'checkout'])
         ->name('platform-fee.checkout');
+    Route::get('history/unlock', [HistoryUnlockController::class, 'checkout'])
+        ->name('history.unlock');
 });
 
 Route::post('payments/victoriabank/callback/{payment}', VictoriaBankCallbackController::class)

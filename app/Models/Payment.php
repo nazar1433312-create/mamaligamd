@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'order_id', 'type', 'provider', 'provider_payment_id',
+    'order_id', 'user_id', 'type', 'provider', 'provider_payment_id',
     'amount', 'commission_amount', 'status', 'raw_response',
 ])]
 class Payment extends Model
@@ -19,6 +19,8 @@ class Payment extends Model
     const TYPE_REFUND = 'refund';
 
     const TYPE_PLATFORM_FEE = 'platform_fee';
+
+    const TYPE_HISTORY_UNLOCK = 'history_unlock';
 
     const STATUS_PENDING = 'pending';
 
@@ -38,5 +40,10 @@ class Payment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

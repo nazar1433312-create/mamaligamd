@@ -17,6 +17,8 @@ class PruneDirectMessages extends Command
 
         $deleted = Message::whereNull('order_id')
             ->where('created_at', '<', now()->subDays($days))
+            ->whereHas('sender', fn ($q) => $q->whereNull('history_paid_at'))
+            ->whereHas('recipient', fn ($q) => $q->whereNull('history_paid_at'))
             ->delete();
 
         $this->info("Deleted {$deleted} direct messages older than {$days} days.");

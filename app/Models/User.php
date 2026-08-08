@@ -39,6 +39,7 @@ class User extends Authenticatable
             'is_banned' => 'boolean',
             'is_verified' => 'boolean',
             'rating_avg' => 'decimal:2',
+            'history_paid_at' => 'datetime',
         ];
     }
 
@@ -102,5 +103,15 @@ class User extends Authenticatable
     public function reportsReceived(): HasMany
     {
         return $this->hasMany(Report::class, 'reported_user_id');
+    }
+
+    public function callsAsCaller(): HasMany
+    {
+        return $this->hasMany(Call::class, 'caller_id');
+    }
+
+    public function callsAsCallee(): HasMany
+    {
+        return $this->hasMany(Call::class, 'callee_id');
     }
 }

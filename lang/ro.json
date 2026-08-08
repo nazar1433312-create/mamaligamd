@@ -197,5 +197,14 @@
     "Написать в поддержку": "Scrie la suport",
     "Здесь личная переписка с другими пользователями сайта.": "Aici este corespondența personală cu ceilalți utilizatori ai site-ului.",
     "Зайдите в профиль специалиста и нажмите «Написать», чтобы начать переписку.": "Intră pe profilul unui specialist și apasă „Scrie”, pentru a începe o conversație.",
-    "Напишите первым — ниже есть поле для сообщения.": "Scrie primul mesaj — câmpul este mai jos."
+    "Напишите первым — ниже есть поле для сообщения.": "Scrie primul mesaj — câmpul este mai jos.",
+    "История переписки и звонков": "Istoricul conversațiilor și apelurilor",
+    "Ваша переписка и звонки хранятся навсегда.": "Conversațiile și apelurile tale sunt păstrate pentru totdeauna.",
+    "По умолчанию личные сообщения и звонки старше 30 дней автоматически удаляются. Заплатите один раз, чтобы хранить их навсегда.": "Implicit, mesajele directe și apelurile mai vechi de 30 de zile sunt șterse automat. Plătește o singură dată ca să le păstrezi pentru totdeauna.",
+    "и хранить навсегда": "și păstrează pentru totdeauna",
+    "Звонки": "Apeluri",
+    "Пропущен": "Ratat",
+    "Отклонён": "Respins",
+    "Завершён": "Încheiat",
+    "Звонков пока нет.": "Încă nu sunt apeluri."
 }

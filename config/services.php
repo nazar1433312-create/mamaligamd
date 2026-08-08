@@ -55,6 +55,7 @@ return [
 
     'platform' => [
         'fee_amount' => env('PLATFORM_FEE_AMOUNT', 50),
+        'history_fee_amount' => env('HISTORY_FEE_AMOUNT', 29),
     ],
 
     'admin_gate' => [

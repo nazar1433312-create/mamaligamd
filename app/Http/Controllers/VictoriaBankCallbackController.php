@@ -21,8 +21,10 @@ class VictoriaBankCallbackController extends Controller
      */
     public function __invoke(Request $request, Payment $payment, VictoriaBankClient $bank, UserNotifier $notifier): RedirectResponse
     {
+        $redirectTo = $this->redirectFor($payment);
+
         if (in_array($payment->status, [Payment::STATUS_SUCCESS, Payment::STATUS_FAILED], true)) {
-            return redirect()->route('orders.show', $payment->order);
+            return redirect($redirectTo);
         }
 
         $response = null;
@@ -46,7 +48,7 @@ class VictoriaBankCallbackController extends Controller
                 'error' => $response?->getLastError(),
             ]);
 
-            return redirect()->route('orders.show', $payment->order);
+            return redirect($redirectTo);
         }
 
         try {
@@ -60,13 +62,23 @@ class VictoriaBankCallbackController extends Controller
             report($e);
         }
 
-        if ($payment->type === Payment::TYPE_PLATFORM_FEE) {
-            $this->handlePlatformFeePaid($payment, $notifier);
-        } elseif ($payment->type === Payment::TYPE_CHARGE) {
-            $this->handleJobPaymentPaid($payment, $notifier);
+        match ($payment->type) {
+            Payment::TYPE_PLATFORM_FEE => $this->handlePlatformFeePaid($payment, $notifier),
+            Payment::TYPE_CHARGE => $this->handleJobPaymentPaid($payment, $notifier),
+            Payment::TYPE_HISTORY_UNLOCK => $this->handleHistoryUnlockPaid($payment, $notifier),
+            default => null,
+        };
+
+        return redirect($redirectTo);
+    }
+
+    private function redirectFor(Payment $payment): string
+    {
+        if ($payment->order_id) {
+            return route('orders.show', $payment->order_id);
         }
 
-        return redirect()->route('orders.show', $payment->order);
+        return route('settings.history');
     }
 
     private function handlePlatformFeePaid(Payment $payment, UserNotifier $notifier): void
@@ -99,5 +111,18 @@ class VictoriaBankCallbackController extends Controller
             $order->loadMissing('acceptedOffer.executor')->acceptedOffer?->executor,
             "💳 Оплата картой по заказу #{$order->id} \"{$order->title}\" прошла успешно."
         );
+    }
+
+    private function handleHistoryUnlockPaid(Payment $payment, UserNotifier $notifier): void
+    {
+        $user = $payment->user;
+
+        if (! $user) {
+            return;
+        }
+
+        $user->update(['history_paid_at' => now()]);
+
+        $notifier->notify($user, '✅ Готово! Переписка и звонки теперь сохраняются навсегда.');
     }
 }
