@@ -42,10 +42,8 @@ return [
         'admin_chat_id' => env('ADMIN_TELEGRAM_CHAT_ID'),
     ],
 
-    'liqpay' => [
-        'public_key' => env('LIQPAY_PUBLIC_KEY'),
-        'private_key' => env('LIQPAY_PRIVATE_KEY'),
-        'sandbox' => env('LIQPAY_SANDBOX', true),
+    'victoriabank' => [
+        'cert_dir' => env('VICTORIA_BANK_CERT_DIR', storage_path('app/victoriabank')),
     ],
 
     'platform' => [

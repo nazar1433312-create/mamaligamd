@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'telegram/webhook/*',
-            'payments/liqpay/callback',
+            'payments/victoriabank/callback/*',
             'calls/*/end',
         ]);
 

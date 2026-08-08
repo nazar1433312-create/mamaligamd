@@ -5,9 +5,11 @@ use App\Http\Controllers\CallController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlatformFeeController;
 use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\VictoriaBankCallbackController;
 use App\Livewire\Admin\Categories as AdminCategories;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Orders as AdminOrders;
+use App\Livewire\Admin\Payouts as AdminPayouts;
 use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\Verifications as AdminVerifications;
 use App\Livewire\Admin\Reports as AdminReports;
@@ -87,14 +89,14 @@ Route::get('support/mine', SupportMyTickets::class)->middleware('auth')->name('s
 Route::get('support/{ticket}', SupportShow::class)->middleware('auth')->name('support.show');
 
 Route::middleware('auth')->group(function () {
-    Route::get('payments/liqpay/checkout/{order}', [PaymentController::class, 'checkout'])
-        ->name('payments.liqpay.checkout');
+    Route::get('payments/victoriabank/checkout/{order}', [PaymentController::class, 'checkout'])
+        ->name('payments.victoriabank.checkout');
     Route::get('orders/{order}/start', [PlatformFeeController::class, 'checkout'])
         ->name('platform-fee.checkout');
 });
 
-Route::post('payments/liqpay/callback', [PaymentController::class, 'callback'])
-    ->name('payments.liqpay.callback');
+Route::post('payments/victoriabank/callback/{payment}', VictoriaBankCallbackController::class)
+    ->name('payments.victoriabank.callback');
 
 Route::middleware(['admin.gate', 'auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboard::class)->name('dashboard');
@@ -106,6 +108,7 @@ Route::middleware(['admin.gate', 'auth', 'admin'])->prefix('admin')->name('admin
     Route::get('verifications/{verificationRequest}/document/{index}', VerificationDocumentController::class)
         ->name('verifications.document');
     Route::get('reports', AdminReports::class)->name('reports');
+    Route::get('payouts', AdminPayouts::class)->name('payouts');
 });
 
 require __DIR__.'/auth.php';

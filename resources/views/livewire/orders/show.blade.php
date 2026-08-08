@@ -135,7 +135,7 @@
                                 <p class="text-sm font-medium text-gray-700 mb-2">{{ __('Способ оплаты') }}:</p>
                                 <div class="flex flex-wrap gap-2">
                                     @if (auth()->user()->is_verified)
-                                        <a href="{{ route('payments.liqpay.checkout', $order) }}"
+                                        <a href="{{ route('payments.victoriabank.checkout', $order) }}"
                                             class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
                                             💳 {{ __('Картой') }} — {{ $order->acceptedOffer->price }} MDL
                                         </a>

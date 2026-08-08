@@ -27,5 +27,6 @@
         <a href="{{ route('admin.support') }}" wire:navigate class="text-indigo-600 hover:underline">Поддержка →</a>
         <a href="{{ route('admin.verifications') }}" wire:navigate class="text-indigo-600 hover:underline">Верификации →</a>
         <a href="{{ route('admin.reports') }}" wire:navigate class="text-indigo-600 hover:underline">Жалобы →</a>
+        <a href="{{ route('admin.payouts') }}" wire:navigate class="text-indigo-600 hover:underline">Выплаты →</a>
     </div>
 </div>

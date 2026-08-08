@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
-use App\Services\LiqPay\LiqPayClient;
+use App\Services\VictoriaBank\VictoriaBankClient;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class PlatformFeeController extends Controller
 {
-    public function checkout(Order $order, LiqPayClient $liqPay): View
+    public function checkout(Order $order, VictoriaBankClient $bank): never
     {
         abort_unless($order->customer_id === Auth::id(), 403);
         abort_unless($order->status === Order::STATUS_PENDING_PAYMENT, 403, 'Заказ уже опубликован или недоступен.');
@@ -20,21 +19,19 @@ class PlatformFeeController extends Controller
         $payment = Payment::create([
             'order_id' => $order->id,
             'type' => Payment::TYPE_PLATFORM_FEE,
+            'provider' => 'victoriabank',
             'amount' => $amount,
             'status' => Payment::STATUS_PENDING,
         ]);
 
-        $fields = $liqPay->checkoutFields([
-            'action' => 'pay',
-            'amount' => $amount,
-            'currency' => 'MDL',
-            'description' => "Публикация заказа: {$order->title}",
-            'order_id' => "platformfee-order-{$order->id}-payment-{$payment->id}",
-            'result_url' => route('orders.show', $order),
-            'server_url' => route('payments.liqpay.callback'),
-            'sandbox' => config('services.liqpay.sandbox') ? 1 : 0,
-        ]);
+        $orderCode = sprintf('PF%08d', $payment->id);
+        $payment->update(['provider_payment_id' => $orderCode]);
 
-        return view('payments.liqpay-redirect', $fields);
+        $bank->authorize(
+            $orderCode,
+            $amount,
+            route('payments.victoriabank.callback', $payment),
+            "Публикация заказа #{$order->id}"
+        );
     }
 }

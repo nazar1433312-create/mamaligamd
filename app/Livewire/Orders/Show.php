@@ -7,7 +7,6 @@ use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Review;
-use App\Services\LiqPay\PayoutService;
 use App\Services\Telegram\UserNotifier;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -108,7 +107,7 @@ class Show extends Component
         $this->order->refresh();
     }
 
-    public function markCompleted(PayoutService $payoutService, UserNotifier $notifier): void
+    public function markCompleted(UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
         abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
@@ -126,9 +125,16 @@ class Show extends Component
             ->exists();
 
         // Cash orders are settled directly between customer and executor —
-        // no platform-held funds to pay out, so we skip the payout call.
+        // no platform-held funds to pay out. Card orders queue a manual
+        // payout for the admin, since Victoriabank's e-commerce gateway has
+        // no API to send money to an arbitrary card.
         if ($wasPaidByCard) {
-            $payoutService->payoutForOrder($this->order->fresh(['acceptedOffer.executor']));
+            Payment::create([
+                'order_id' => $this->order->id,
+                'type' => Payment::TYPE_PAYOUT,
+                'amount' => $this->order->acceptedOffer->price,
+                'status' => Payment::STATUS_PENDING,
+            ]);
         }
 
         $notifier->notify(
