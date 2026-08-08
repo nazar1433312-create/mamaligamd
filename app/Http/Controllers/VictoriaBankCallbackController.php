@@ -121,7 +121,7 @@ class VictoriaBankCallbackController extends Controller
             return;
         }
 
-        $user->update(['history_paid_at' => now()]);
+        $user->forceFill(['history_paid_at' => now()])->save();
 
         $notifier->notify($user, '✅ Готово! Переписка и звонки теперь сохраняются навсегда.');
     }

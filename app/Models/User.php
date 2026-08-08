@@ -16,6 +16,7 @@ use Illuminate\Notifications\Notifiable;
 #[Fillable([
     'name', 'email', 'password', 'telegram_id', 'telegram_username',
     'phone', 'city_id', 'avatar_path', 'about', 'is_executor',
+    'is_verified', 'is_banned', 'rating_count', 'rating_avg',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'status', 'document_paths'])]
+#[Fillable(['user_id', 'status', 'document_paths', 'reviewed_by', 'reviewed_at', 'admin_comment'])]
 class VerificationRequest extends Model
 {
     const STATUS_PENDING = 'pending';
