@@ -9,8 +9,8 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "127.0.0.1:${APP_PORT:-8090}:80"
-    mem_limit: 64m
-    cpus: 0.08
+    mem_limit: 48m
+    cpus: 0.06
 
   app:
     build:
@@ -40,8 +40,8 @@ services:
       - ./:/var/www/html
     env_file:
       - .env
-    mem_limit: 400m
-    cpus: 0.15
+    mem_limit: 350m
+    cpus: 0.12
 
   scheduler:
     build:
@@ -56,8 +56,8 @@ services:
       - ./:/var/www/html
     env_file:
       - .env
-    mem_limit: 96m
-    cpus: 0.04
+    mem_limit: 64m
+    cpus: 0.02
 
   postgres:
     image: postgres:16-alpine
@@ -79,6 +79,30 @@ services:
       - redisdata:/data
     mem_limit: 150m
     cpus: 0.05
+
+  # TURN relay for WebRTC calls, used only when two browsers can't reach each
+  # other directly (strict NAT / corporate firewall). Nothing is recorded or
+  # written to disk — audio is relayed live and discarded.
+  coturn:
+    image: coturn/coturn:4.6-alpine
+    restart: unless-stopped
+    network_mode: host
+    command: >
+      turnserver
+      --listening-port=3478
+      --fingerprint
+      --lt-cred-mech
+      --user=${TURN_USERNAME:-mamaliga}:${TURN_PASSWORD:-change_me}
+      --realm=${TURN_REALM:-mamaligamd.duckdns.org}
+      --min-port=49160
+      --max-port=49200
+      --no-cli
+      --no-tls
+      --no-dtls
+      --log-file=stdout
+      --simple-log
+    mem_limit: 80m
+    cpus: 0.06
 
 volumes:
   pgdata:

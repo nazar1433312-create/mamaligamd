@@ -46,6 +46,13 @@ return [
         'cert_dir' => env('VICTORIA_BANK_CERT_DIR', storage_path('app/victoriabank')),
     ],
 
+    'turn' => [
+        'host' => env('TURN_HOST'),
+        'port' => env('TURN_PORT', 3478),
+        'username' => env('TURN_USERNAME'),
+        'password' => env('TURN_PASSWORD'),
+    ],
+
     'platform' => [
         'fee_amount' => env('PLATFORM_FEE_AMOUNT', 50),
     ],

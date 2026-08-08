@@ -38,7 +38,73 @@
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
+            @if (config('services.turn.host') && config('services.turn.username'))
+            {
+                urls: [
+                    'turn:{{ config('services.turn.host') }}:{{ config('services.turn.port') }}?transport=udp',
+                    'turn:{{ config('services.turn.host') }}:{{ config('services.turn.port') }}?transport=tcp',
+                ],
+                username: '{{ config('services.turn.username') }}',
+                credential: '{{ config('services.turn.password') }}',
+            },
+            @endif
         ],
+
+        audioCtx: null,
+        ringtoneTimer: null,
+        ringbackTimer: null,
+
+        getAudioCtx() {
+            if (!this.audioCtx) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                this.audioCtx = new Ctx();
+            }
+            if (this.audioCtx.state === 'suspended') {
+                this.audioCtx.resume().catch(() => {});
+            }
+            return this.audioCtx;
+        },
+
+        beep(freqs, duration, volume) {
+            try {
+                const ctx = this.getAudioCtx();
+                const gain = ctx.createGain();
+                gain.gain.value = volume;
+                gain.connect(ctx.destination);
+                freqs.forEach((f) => {
+                    const osc = ctx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = f;
+                    osc.connect(gain);
+                    osc.start();
+                    osc.stop(ctx.currentTime + duration);
+                });
+            } catch (e) {}
+        },
+
+        startRingtone() {
+            if (this.ringtoneTimer) return;
+            const ring = () => this.beep([440, 480], 0.9, 0.12);
+            ring();
+            this.ringtoneTimer = setInterval(ring, 1800);
+        },
+
+        stopRingtone() {
+            clearInterval(this.ringtoneTimer);
+            this.ringtoneTimer = null;
+        },
+
+        startRingback() {
+            if (this.ringbackTimer) return;
+            const beep = () => this.beep([425], 1, 0.08);
+            beep();
+            this.ringbackTimer = setInterval(beep, 3000);
+        },
+
+        stopRingback() {
+            clearInterval(this.ringbackTimer);
+            this.ringbackTimer = null;
+        },
 
         csrf() {
             return document.querySelector('meta[name="csrf-token"]').content;
@@ -74,9 +140,11 @@
             this.role = 'callee';
             document.getElementById('call-incoming-name').textContent = call.caller_name;
             document.getElementById('call-incoming-banner').classList.remove('hidden');
+            this.startRingtone();
         },
 
         async accept() {
+            this.stopRingtone();
             document.getElementById('call-incoming-banner').classList.add('hidden');
             const name = document.getElementById('call-incoming-name').textContent;
             try {
@@ -95,6 +163,7 @@
         },
 
         async decline() {
+            this.stopRingtone();
             if (this.callId) await this.post(`/calls/${this.callId}/decline`);
             document.getElementById('call-incoming-banner').classList.add('hidden');
             this.reset();
@@ -112,6 +181,7 @@
                 await this.pc.setLocalDescription(offer);
                 await this.post(`/calls/${this.callId}/offer`, { sdp: offer.sdp });
                 this.showActiveBar(calleeName, '{{ __('Вызов...') }}');
+                this.startRingback();
                 this.startCandidatePolling();
                 this.startStatusPolling();
             } catch (e) {
@@ -161,6 +231,7 @@
                     const data = await this.get(`/calls/${this.callId}`);
                     if (this.role === 'caller' && data.status === 'accepted' && data.answer_sdp && !this.answerSet) {
                         this.answerSet = true;
+                        this.stopRingback();
                         await this.pc.setRemoteDescription({ type: 'answer', sdp: data.answer_sdp });
                         this.setActiveStatus('{{ __('В разговоре') }}');
                     }
@@ -182,6 +253,8 @@
         },
 
         async hangup(notify) {
+            this.stopRingtone();
+            this.stopRingback();
             if (notify && this.callId) {
                 try { await this.post(`/calls/${this.callId}/end`); } catch (e) {}
             }
@@ -191,6 +264,8 @@
         },
 
         reset() {
+            this.stopRingtone();
+            this.stopRingback();
             clearInterval(this.candidatePollTimer);
             clearInterval(this.statusPollTimer);
             this.candidatePollTimer = null;
@@ -205,6 +280,17 @@
 
     window.MamaligaCall = Call;
     Call.startRingWatcher();
+
+    // Browsers block audio until the page has seen a real user gesture —
+    // warm up the AudioContext on the first click/tap so the ringtone can
+    // actually play once an incoming call arrives via background polling.
+    const unlockAudio = () => {
+        Call.getAudioCtx();
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+    };
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
 
     window.addEventListener('beforeunload', () => {
         if (Call.callId) {
