@@ -13,6 +13,7 @@ use App\Livewire\Admin\Payouts as AdminPayouts;
 use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\Verifications as AdminVerifications;
 use App\Livewire\Admin\Reports as AdminReports;
+use App\Livewire\Game;
 use App\Livewire\Orders\Create as OrdersCreate;
 use App\Livewire\Orders\Edit as OrdersEdit;
 use App\Livewire\Orders\Favorites as OrdersFavorites;
@@ -60,6 +61,8 @@ Route::get('orders/favorites', OrdersFavorites::class)->middleware('auth')->name
 Route::get('executor', ExecutorDashboard::class)->middleware('auth')->name('executor.dashboard');
 Route::get('orders/{order}/edit', OrdersEdit::class)->middleware('auth')->name('orders.edit');
 Route::get('orders/{order}', OrdersShow::class)->name('orders.show');
+
+Route::get('game', Game::class)->name('game');
 
 Route::get('specialists', UsersDirectory::class)->name('users.directory');
 Route::get('users/{user}', PublicProfile::class)->name('users.show');

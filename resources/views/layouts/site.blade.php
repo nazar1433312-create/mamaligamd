@@ -30,6 +30,7 @@
                             <a href="{{ route('orders.my') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Мои заказы') }}</a>
                         @endauth
                         <a href="{{ route('support.create') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Поддержка') }}</a>
+                        <a href="{{ route('game') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">🎮 {{ __('Игра') }}</a>
                         @auth
                             @if(auth()->user()->is_admin)
                                 <a href="{{ route('admin.dashboard') }}" wire:navigate class="text-gray-600 hover:text-indigo-600">{{ __('Админка') }}</a>
