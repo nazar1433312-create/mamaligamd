@@ -16,20 +16,18 @@ class PlatformFeeController extends Controller
 
         $amount = (float) config('services.platform.fee_amount');
 
-        $payment = Payment::create([
-            'order_id' => $order->id,
-            'type' => Payment::TYPE_PLATFORM_FEE,
-            'provider' => 'victoriabank',
-            'amount' => $amount,
-            'status' => Payment::STATUS_PENDING,
-        ]);
+        $payment = Payment::firstOrCreate(
+            ['order_id' => $order->id, 'type' => Payment::TYPE_PLATFORM_FEE, 'status' => Payment::STATUS_PENDING],
+            ['provider' => 'victoriabank', 'amount' => $amount]
+        );
 
-        $orderCode = sprintf('PF%08d', $payment->id);
-        $payment->update(['provider_payment_id' => $orderCode]);
+        if (! $payment->provider_payment_id) {
+            $payment->update(['provider_payment_id' => sprintf('PF%08d', $payment->id)]);
+        }
 
         $bank->authorize(
-            $orderCode,
-            $amount,
+            $payment->provider_payment_id,
+            (float) $payment->amount,
             route('payments.victoriabank.callback', $payment),
             "Публикация заказа #{$order->id}"
         );

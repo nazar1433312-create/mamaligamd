@@ -19,6 +19,12 @@ class Verification extends Component
 
     public function submit(TelegramApi $api): void
     {
+        abort_if(
+            VerificationRequest::where('user_id', Auth::id())->where('status', VerificationRequest::STATUS_PENDING)->exists(),
+            403,
+            'У вас уже есть заявка на рассмотрении.'
+        );
+
         $this->validate([
             'documents' => ['required', 'array', 'min:1', 'max:3'],
             'documents.*' => ['image', 'max:5120'],

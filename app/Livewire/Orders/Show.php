@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Review;
 use App\Services\Telegram\UserNotifier;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -29,6 +30,13 @@ class Show extends Component
 
     public function mount(Order $order): void
     {
+        // A pending_payment order hasn't been published yet — only its
+        // owner should be able to see it (matches the "pay to make it
+        // visible to executors" promise shown on the checkout screen).
+        if ($order->status === Order::STATUS_PENDING_PAYMENT && $order->customer_id !== Auth::id()) {
+            abort(404);
+        }
+
         $this->order = $order;
     }
 
@@ -60,20 +68,30 @@ class Show extends Component
     public function acceptOffer(int $offerId, UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
-        abort_unless($this->order->status === Order::STATUS_OPEN, 403);
 
-        $offer = Offer::where('order_id', $this->order->id)->findOrFail($offerId);
+        // Locked so two near-simultaneous accept clicks (double tap, two
+        // tabs) can't both pass the "still open" check and each accept a
+        // different offer for the same order.
+        $offer = DB::transaction(function () use ($offerId) {
+            $order = Order::whereKey($this->order->id)->lockForUpdate()->firstOrFail();
 
-        $offer->update(['status' => Offer::STATUS_ACCEPTED]);
+            abort_unless($order->status === Order::STATUS_OPEN, 403);
 
-        Offer::where('order_id', $this->order->id)
-            ->where('id', '!=', $offer->id)
-            ->update(['status' => Offer::STATUS_REJECTED]);
+            $offer = Offer::where('order_id', $order->id)->findOrFail($offerId);
 
-        $this->order->update([
-            'status' => Order::STATUS_IN_PROGRESS,
-            'accepted_offer_id' => $offer->id,
-        ]);
+            $offer->update(['status' => Offer::STATUS_ACCEPTED]);
+
+            Offer::where('order_id', $order->id)
+                ->where('id', '!=', $offer->id)
+                ->update(['status' => Offer::STATUS_REJECTED]);
+
+            $order->update([
+                'status' => Order::STATUS_IN_PROGRESS,
+                'accepted_offer_id' => $offer->id,
+            ]);
+
+            return $offer;
+        });
 
         $notifier->notify(
             $offer->executor,
@@ -86,63 +104,74 @@ class Show extends Component
     public function payCash(UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
-        abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
-        abort_if($this->order->paid_at, 403);
 
-        Payment::create([
-            'order_id' => $this->order->id,
-            'type' => Payment::TYPE_CHARGE,
-            'provider' => 'cash',
-            'amount' => $this->order->acceptedOffer->price,
-            'status' => Payment::STATUS_SUCCESS,
-        ]);
+        DB::transaction(function () {
+            $order = Order::whereKey($this->order->id)->lockForUpdate()->firstOrFail();
 
-        $this->order->update(['paid_at' => now()]);
+            abort_unless($order->status === Order::STATUS_IN_PROGRESS, 403);
+            abort_if($order->paid_at, 403);
+
+            Payment::create([
+                'order_id' => $order->id,
+                'type' => Payment::TYPE_CHARGE,
+                'provider' => 'cash',
+                'amount' => $order->acceptedOffer->price,
+                'status' => Payment::STATUS_SUCCESS,
+            ]);
+
+            $order->update(['paid_at' => now()]);
+        });
+
+        $this->order->refresh();
 
         $notifier->notify(
             $this->order->acceptedOffer->executor,
             "💵 Заказчик подтвердил оплату наличными по заказу #{$this->order->id} \"{$this->order->title}\"."
         );
-
-        $this->order->refresh();
     }
 
     public function markCompleted(UserNotifier $notifier): void
     {
         abort_unless($this->order->customer_id === Auth::id(), 403);
-        abort_unless($this->order->status === Order::STATUS_IN_PROGRESS, 403);
-        abort_unless($this->order->paid_at, 403, 'Сначала оплатите заказ.');
 
-        $this->order->update([
-            'status' => Order::STATUS_COMPLETED,
-            'completed_at' => now(),
-        ]);
+        DB::transaction(function () {
+            $order = Order::whereKey($this->order->id)->lockForUpdate()->firstOrFail();
 
-        $wasPaidByCard = Payment::where('order_id', $this->order->id)
-            ->where('type', Payment::TYPE_CHARGE)
-            ->where('status', Payment::STATUS_SUCCESS)
-            ->where('provider', '!=', 'cash')
-            ->exists();
+            abort_unless($order->status === Order::STATUS_IN_PROGRESS, 403);
+            abort_unless($order->paid_at, 403, 'Сначала оплатите заказ.');
 
-        // Cash orders are settled directly between customer and executor —
-        // no platform-held funds to pay out. Card orders queue a manual
-        // payout for the admin, since Victoriabank's e-commerce gateway has
-        // no API to send money to an arbitrary card.
-        if ($wasPaidByCard) {
-            Payment::create([
-                'order_id' => $this->order->id,
-                'type' => Payment::TYPE_PAYOUT,
-                'amount' => $this->order->acceptedOffer->price,
-                'status' => Payment::STATUS_PENDING,
+            $order->update([
+                'status' => Order::STATUS_COMPLETED,
+                'completed_at' => now(),
             ]);
-        }
+
+            $wasPaidByCard = Payment::where('order_id', $order->id)
+                ->where('type', Payment::TYPE_CHARGE)
+                ->where('status', Payment::STATUS_SUCCESS)
+                ->where('provider', '!=', 'cash')
+                ->exists();
+
+            // Cash orders are settled directly between customer and executor —
+            // no platform-held funds to pay out. Card orders queue a manual
+            // payout for the admin, since Victoriabank's e-commerce gateway has
+            // no API to send money to an arbitrary card.
+            if ($wasPaidByCard) {
+                Payment::create([
+                    'order_id' => $order->id,
+                    'user_id' => $order->acceptedOffer->executor_id,
+                    'type' => Payment::TYPE_PAYOUT,
+                    'amount' => $order->acceptedOffer->price,
+                    'status' => Payment::STATUS_PENDING,
+                ]);
+            }
+        });
+
+        $this->order->refresh();
 
         $notifier->notify(
             $this->order->acceptedOffer->executor,
             "🎉 Заказчик подтвердил выполнение заказа #{$this->order->id} \"{$this->order->title}\". Спасибо за работу!"
         );
-
-        $this->order->refresh();
     }
 
     public function sendMessage(UserNotifier $notifier): void

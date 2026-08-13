@@ -30,7 +30,7 @@
                 @error('documents.*') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-md font-medium hover:bg-indigo-700">
+            <button type="submit" wire:loading.attr="disabled" class="w-full bg-indigo-600 text-white py-2.5 rounded-md font-medium hover:bg-indigo-700 disabled:opacity-50">
                 {{ __('Отправить на проверку') }}
             </button>
         </form>

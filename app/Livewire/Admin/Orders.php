@@ -26,8 +26,11 @@ class Orders extends Component
 
     public function resolveDispute(int $orderId, string $resolution): void
     {
-        $status = $resolution === 'complete' ? Order::STATUS_COMPLETED : Order::STATUS_CANCELLED;
-        Order::whereKey($orderId)->update(['status' => $status]);
+        if ($resolution === 'complete') {
+            Order::whereKey($orderId)->update(['status' => Order::STATUS_COMPLETED, 'completed_at' => now()]);
+        } else {
+            Order::whereKey($orderId)->update(['status' => Order::STATUS_CANCELLED, 'cancelled_at' => now()]);
+        }
     }
 
     public function deleteOrder(int $orderId): void

@@ -16,7 +16,7 @@
             class="w-full rounded-md border-gray-300 text-sm">
         @error('cardNumber') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+        <button type="submit" wire:loading.attr="disabled" class="w-full bg-indigo-600 text-white py-2 rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50">
             Сохранить
         </button>
     </form>

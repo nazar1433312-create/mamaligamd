@@ -24,7 +24,12 @@
                     <div class="text-sm text-gray-500 mt-1">
                         Сумма: <b>{{ number_format($payment->amount, 2) }} MDL</b>
                         @if ($card)
-                            · Карта: <span class="font-mono">{{ $card->card_number_encrypted }}</span> ({{ $card->card_masked }})
+                            · Карта:
+                            <span x-data="{ shown: false }" class="font-mono">
+                                <span x-show="!shown">{{ $card->card_masked }}</span>
+                                <span x-show="shown" x-cloak>{{ $card->card_number_encrypted }}</span>
+                                <button type="button" @click="shown = !shown" class="text-indigo-600 hover:underline font-sans text-xs ms-1" x-text="shown ? 'скрыть' : 'показать'"></button>
+                            </span>
                         @else
                             · <span class="text-red-600">нет карты для выплаты на файле</span>
                         @endif

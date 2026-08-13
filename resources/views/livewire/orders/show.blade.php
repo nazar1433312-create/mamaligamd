@@ -56,10 +56,10 @@
             @if ($order->status === 'pending_payment' && $order->customer_id === auth()->id())
                 <div class="bg-amber-50 border border-amber-200 p-6 rounded-xl">
                     <h2 class="font-semibold mb-2">{{ __('Заказ ещё не опубликован') }}</h2>
-                    <p class="text-sm text-gray-600 mb-4">{{ __('Комиссия платформы') }}: {{ $platformFeeAmount }} MDL — {{ __('оплатите, чтобы заказ стал виден исполнителям.') }}</p>
+                    <p class="text-sm text-gray-600 mb-4">{{ __('Комиссия платформы') }}: {{ number_format($platformFeeAmount, 0, ',', ' ') }} MDL — {{ __('оплатите, чтобы заказ стал виден исполнителям.') }}</p>
                     <a href="{{ route('platform-fee.checkout', $order) }}"
                         class="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-indigo-700">
-                        💳 {{ __('Оплатить') }} {{ $platformFeeAmount }} MDL {{ __('и опубликовать') }}
+                        💳 {{ __('Оплатить') }} {{ number_format($platformFeeAmount, 0, ',', ' ') }} MDL {{ __('и опубликовать') }}
                     </a>
                 </div>
             @endif
@@ -74,7 +74,7 @@
                     @if ($order->customer_id !== auth()->id())
                         <div class="mb-6 p-4 bg-gray-50 rounded-md">
                             @if ($myOffer)
-                                <p class="text-sm text-gray-600">{{ __('Вы откликнулись с ценой') }} <b>{{ $myOffer->price }} MDL</b>. {{ __('Ожидайте решения заказчика.') }}</p>
+                                <p class="text-sm text-gray-600">{{ __('Вы откликнулись с ценой') }} <b>{{ number_format($myOffer->price, 0, ',', ' ') }} MDL</b>. {{ __('Ожидайте решения заказчика.') }}</p>
                             @else
                                 <form wire:submit="makeOffer" class="space-y-3">
                                     <div class="flex gap-3">
@@ -98,7 +98,7 @@
                                 <a href="{{ route('users.show', $offer->executor) }}" wire:navigate class="font-medium text-gray-900 hover:text-indigo-600">{{ $offer->executor->name }}</a>
                                 @if ($offer->executor->is_verified) <x-verified-badge /> @endif
                                 <x-rating-badge :user="$offer->executor" />
-                                <span class="text-sm text-gray-500 ms-2">{{ $offer->price }} MDL</span>
+                                <span class="text-sm text-gray-500 ms-2">{{ number_format($offer->price, 0, ',', ' ') }} MDL</span>
                                 @if ($offer->message)
                                     <p class="text-sm text-gray-500 mt-1">{{ $offer->message }}</p>
                                 @endif
@@ -106,7 +106,8 @@
                             @auth
                                 @if ($order->customer_id === auth()->id())
                                     <button wire:click="acceptOffer({{ $offer->id }})" wire:confirm="{{ __('Выбрать этого исполнителя?') }}"
-                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700">{{ __('В работе') }}</button>
+                                        wire:loading.attr="disabled"
+                                        class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 disabled:opacity-50">{{ __('В работе') }}</button>
                                 @endif
                             @endauth
                         </div>
@@ -126,7 +127,7 @@
                 </a>
                 @if ($order->acceptedOffer->executor->is_verified) <x-verified-badge /> @endif
                 <x-rating-badge :user="$order->acceptedOffer->executor" />
-                <span class="text-sm text-gray-500 ms-2">{{ $order->acceptedOffer->price }} MDL</span>
+                <span class="text-sm text-gray-500 ms-2">{{ number_format($order->acceptedOffer->price, 0, ',', ' ') }} MDL</span>
 
                 @auth
                     @if ($order->status === 'in_progress' && $order->customer_id === auth()->id())
@@ -137,7 +138,7 @@
                                     @if (auth()->user()->is_verified)
                                         <a href="{{ route('payments.victoriabank.checkout', $order) }}"
                                             class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                                            💳 {{ __('Картой') }} — {{ $order->acceptedOffer->price }} MDL
+                                            💳 {{ __('Картой') }} — {{ number_format($order->acceptedOffer->price, 0, ',', ' ') }} MDL
                                         </a>
                                     @else
                                         <a href="{{ route('settings.verification') }}" wire:navigate
@@ -146,14 +147,16 @@
                                         </a>
                                     @endif
                                     <button wire:click="payCash" wire:confirm="{{ __('Подтвердить оплату наличными исполнителю?') }}"
-                                        class="inline-block bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50">
-                                        💵 {{ __('Наличными') }} — {{ $order->acceptedOffer->price }} MDL
+                                        wire:loading.attr="disabled"
+                                        class="inline-block bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 disabled:opacity-50">
+                                        💵 {{ __('Наличными') }} — {{ number_format($order->acceptedOffer->price, 0, ',', ' ') }} MDL
                                     </button>
                                 </div>
                             @else
                                 <p class="text-sm text-green-700 mb-2">✅ {{ __('Оплачено') }}</p>
                                 <button wire:click="markCompleted" wire:confirm="{{ __('Подтвердить, что работа выполнена?') }}"
-                                    class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                                    wire:loading.attr="disabled"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50">
                                     ✅ {{ __('Работа выполнена') }}
                                 </button>
                             @endif

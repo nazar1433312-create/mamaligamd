@@ -30,7 +30,8 @@
                         </td>
                         <td class="px-4 py-2 text-right">
                             <button wire:click="toggleBan({{ $user->id }})" wire:confirm="Подтвердите действие"
-                                class="text-xs text-indigo-600 hover:underline">
+                                wire:loading.attr="disabled"
+                                class="text-xs text-indigo-600 hover:underline disabled:opacity-50">
                                 {{ $user->is_banned ? 'Разбанить' : 'Забанить' }}
                             </button>
                         </td>

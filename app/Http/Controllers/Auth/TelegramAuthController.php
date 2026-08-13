@@ -46,7 +46,14 @@ class TelegramAuthController extends Controller
             abort(403, 'Login link has expired.');
         }
 
-        $loginToken->update(['used_at' => now()]);
+        // Atomic claim: only the request that actually flips used_at from
+        // NULL wins, so two concurrent hits on the same link (link preview
+        // bots, double-tap) can't both authenticate.
+        $claimed = TelegramLoginToken::whereKey($loginToken->id)
+            ->whereNull('used_at')
+            ->update(['used_at' => now()]);
+
+        abort_unless($claimed === 1, 403, 'Login link has expired.');
 
         Auth::login($loginToken->user, remember: true);
 

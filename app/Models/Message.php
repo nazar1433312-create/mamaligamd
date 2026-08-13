@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['order_id', 'sender_id', 'recipient_id', 'body'])]
+#[Fillable(['order_id', 'sender_id', 'recipient_id', 'body', 'read_at'])]
 class Message extends Model
 {
     protected function casts(): array

@@ -14,20 +14,18 @@ class HistoryUnlockController extends Controller
 
         $amount = (float) config('services.platform.history_fee_amount');
 
-        $payment = Payment::create([
-            'user_id' => Auth::id(),
-            'type' => Payment::TYPE_HISTORY_UNLOCK,
-            'provider' => 'victoriabank',
-            'amount' => $amount,
-            'status' => Payment::STATUS_PENDING,
-        ]);
+        $payment = Payment::firstOrCreate(
+            ['user_id' => Auth::id(), 'type' => Payment::TYPE_HISTORY_UNLOCK, 'status' => Payment::STATUS_PENDING],
+            ['provider' => 'victoriabank', 'amount' => $amount]
+        );
 
-        $orderCode = sprintf('HU%08d', $payment->id);
-        $payment->update(['provider_payment_id' => $orderCode]);
+        if (! $payment->provider_payment_id) {
+            $payment->update(['provider_payment_id' => sprintf('HU%08d', $payment->id)]);
+        }
 
         $bank->authorize(
-            $orderCode,
-            $amount,
+            $payment->provider_payment_id,
+            (float) $payment->amount,
             route('payments.victoriabank.callback', $payment),
             'Сохранение переписки и звонков навсегда'
         );
