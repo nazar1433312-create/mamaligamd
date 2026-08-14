@@ -4,9 +4,11 @@ services:
     restart: unless-stopped
     depends_on:
       - app
+      - idlegate
     volumes:
       - ./:/var/www/html:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - idle_heartbeat:/var/run/idle
     ports:
       - "127.0.0.1:${APP_PORT:-8090}:80"
     mem_limit: 48m
@@ -26,6 +28,26 @@ services:
       - .env
     mem_limit: 1300m
     cpus: 0.50
+
+  # Lets `app` (nginx+PHP-FPM's actual backend) fully stop after 10 minutes
+  # with no site/bot traffic, and starts it again on the next request —
+  # frees ~1.3GB for the other projects sharing this VPS while the site is
+  # idle. The only thing with access to docker.sock; everything else is
+  # unprivileged. See docker/idlegate/main.go.
+  idlegate:
+    build:
+      context: ./docker/idlegate
+    restart: unless-stopped
+    environment:
+      SERVICE_LABEL: com.docker.compose.service=app
+      HEARTBEAT_PATH: /var/run/idle/heartbeat.log
+      IDLE_TIMEOUT: 10m
+      CHECK_INTERVAL: 30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - idle_heartbeat:/var/run/idle
+    mem_limit: 24m
+    cpus: 0.03
 
   queue:
     build:
@@ -107,3 +129,4 @@ services:
 volumes:
   pgdata:
   redisdata:
+  idle_heartbeat:
